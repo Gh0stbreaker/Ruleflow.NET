@@ -11,5 +11,11 @@ namespace Ruleflow.NET.Engine.Validation
             var validator = new Core.Validators.Validator<T>(rules);
             return validator.CollectValidationResults(input);
         }
+
+        public static ValidationResult ValidateBatch<T>(this IEnumerable<T> inputs, IEnumerable<IValidationRule<T>> rules)
+        {
+            var validator = new Core.Validators.BatchValidator<T>(rules);
+            return validator.CollectValidationResults(inputs);
+        }
     }
 }
