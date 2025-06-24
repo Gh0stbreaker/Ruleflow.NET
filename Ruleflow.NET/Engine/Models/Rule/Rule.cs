@@ -1,4 +1,7 @@
 ﻿using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
+using Ruleflow.NET.Engine.Models.Rule.Interface;
+using Ruleflow.NET.Engine.Models.Rule.Context;
+using Ruleflow.NET.Engine.Models.Evaluation;
 using System.Text;
 using Ruleflow.NET.Engine.Models.Rule.Reference;
 
@@ -10,7 +13,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
     /// <para>Represents a single validation rule within the Ruleflow.NET system.</para>
     /// </summary>
     /// <typeparam name="TInput">Typ dat, která budou validována. / Type of the input being validated.</typeparam>
-    public class Rule<TInput>(
+    public abstract class Rule<TInput>(
         int id,
         IRuleType<TInput> type,
         string? ruleId = null,
@@ -19,6 +22,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
         int priority = 0,
         bool isActive = true,
         DateTimeOffset? timestamp = null)
+        : IRule<TInput>
     {
         /// <summary>
         /// Interní identifikátor pravidla.
@@ -65,6 +69,15 @@ namespace Ruleflow.NET.Engine.Models.Rule
         public int RuleTypeId { get; } = type.Id;
         public IRuleType<TInput> Type { get; } = type ?? throw new ArgumentNullException(nameof(type));
         public RuleReference<TInput> Reference => new RuleReference<TInput>(this);
+
+        /// <summary>
+        /// Vyhodnotí pravidlo proti zadaným vstupním datům.
+        /// <para>Evaluates the rule against the provided input within the given context.</para>
+        /// </summary>
+        /// <param name="input">Vstupní data pro validaci.</param>
+        /// <param name="context">Kontext vyhodnocení pravidla.</param>
+        /// <returns>Výsledek vyhodnocení pravidla.</returns>
+        public abstract RuleEvaluationResult<TInput> Evaluate(TInput input, RuleContext context);
 
         public override string ToString()
         {
