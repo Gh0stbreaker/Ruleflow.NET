@@ -92,6 +92,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// <param name="ruleType">Typ pravidla (volitelné).</param>
         /// <returns>Builder pro přepínací pravidlo se silně typovaným klíčem.</returns>
         public static SwitchRuleBuilder<TInput, TKey> CreateSwitchRuleBuilder<TInput, TKey>(RuleType<TInput>? ruleType = null)
+            where TKey : notnull
         {
             ruleType ??= CreateRuleType<TInput>("TYPED_SWITCH", "Typed Switch Rule", "Typované přepínací pravidlo");
             return new SwitchRuleBuilder<TInput, TKey>(GetNextRuleId(), ruleType);
