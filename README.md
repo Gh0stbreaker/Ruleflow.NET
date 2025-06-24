@@ -66,6 +66,18 @@ if (!result.IsValid)
 }
 ```
 
+#### Using with Dependency Injection
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+var services = new ServiceCollection();
+services.AddRuleflow<Person>(options =>
+{
+    options.InitialRules = new[] { ageRule };
+});
+var provider = services.BuildServiceProvider();
+```
+
 #### Advanced Validation with Conditional Logic
 
 ```csharp
