@@ -318,5 +318,75 @@ namespace Ruleflow.NET.Tests
             Assert.IsTrue(result.IsValid);
             Assert.AreEqual(0, result.Errors.Count);
         }
+
+        [TestMethod]
+        public void ValidateBatch_AllValidInputs_ReturnsSuccess()
+        {
+            // Arrange
+            var priceRule = RuleflowExtensions.CreateRule<Product>()
+                .WithAction(p => {
+                    if (p.Price <= 0)
+                        throw new ArgumentException("Price must be positive");
+                })
+                .Build();
+
+            var stockRule = RuleflowExtensions.CreateRule<Product>()
+                .WithAction(p => {
+                    if (p.StockQuantity < 0)
+                        throw new ArgumentException("Stock quantity cannot be negative");
+                })
+                .Build();
+
+            var rules = new[] { priceRule, stockRule };
+
+            var batch = new List<Product>
+            {
+                new Product { Name = "A", Price = 5.0m, StockQuantity = 1 },
+                new Product { Name = "B", Price = 10.0m, StockQuantity = 2 }
+            };
+
+            // Act
+            var result = batch.ValidateBatch(rules);
+
+            // Assert
+            Assert.IsTrue(result.IsValid);
+            Assert.AreEqual(0, result.Errors.Count);
+        }
+
+        [TestMethod]
+        public void ValidateBatch_WithInvalidInputs_ReturnsAggregatedErrors()
+        {
+            // Arrange
+            var priceRule = RuleflowExtensions.CreateRule<Product>()
+                .WithAction(p => {
+                    if (p.Price <= 0)
+                        throw new ArgumentException("Price must be positive");
+                })
+                .Build();
+
+            var stockRule = RuleflowExtensions.CreateRule<Product>()
+                .WithAction(p => {
+                    if (p.StockQuantity < 0)
+                        throw new ArgumentException("Stock quantity cannot be negative");
+                })
+                .Build();
+
+            var rules = new[] { priceRule, stockRule };
+
+            var batch = new List<Product>
+            {
+                new Product { Name = "A", Price = 5.0m, StockQuantity = 1 },
+                new Product { Name = "B", Price = 0, StockQuantity = -2 }
+            };
+
+            // Act
+            var result = batch.ValidateBatch(rules);
+
+            // Assert
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual(2, result.Errors.Count);
+            Assert.AreEqual("Price must be positive", result.Errors[0].Message);
+            Assert.AreEqual("Stock quantity cannot be negative", result.Errors[1].Message);
+        }
     }
 }
