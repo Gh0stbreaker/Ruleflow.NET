@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ruleflow.NET.Engine.Validation.Core.Results;
-using Ruleflow.NET.Engine.Validation.Core.Exceptions;
 using Ruleflow.NET.Engine.Validation.Enums;
 using System;
 using System.Collections.Generic;
