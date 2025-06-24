@@ -26,6 +26,7 @@ Ruleflow.NET is a flexible, high-performance business rules and validation frame
 - **Batch Validation** - Validate collections of inputs with `BatchValidator`
 - **Composite Validators** - Merge results from multiple validators using `CompositeValidator`
 - **Shared Validation Context** - Pass data and rule results between rules via `ValidationContext`
+- **Event and Action Hooks** - Trigger custom actions or events from validation rules
 
 ### 🚀 Getting Started
 

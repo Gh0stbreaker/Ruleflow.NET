@@ -11,5 +11,7 @@ namespace Ruleflow.NET.Engine.Validation
         public static ConditionalRuleBuilder<T> CreateConditionalRule<T>(Func<T, bool> predicate) => new ConditionalRuleBuilder<T>(predicate);
         public static SwitchRuleBuilder<T, TKey> CreateSwitchRule<T, TKey>(Func<T, TKey> selector)
             where TKey : notnull => new SwitchRuleBuilder<T, TKey>(selector);
+        public static EventTriggerRuleBuilder<T> CreateEventRule<T>(string eventName) =>
+            new EventTriggerRuleBuilder<T>().WithEvent(eventName);
     }
 }
