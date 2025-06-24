@@ -13,6 +13,7 @@ using System.Collections.Generic;
 namespace Ruleflow.NET.Tests
 {
     [TestClass]
+    [DoNotParallelize]
     public class ValidationContextTests
     {
         private class ShoppingCart
