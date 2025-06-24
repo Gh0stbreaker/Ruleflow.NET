@@ -10,6 +10,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
 {
     /// <summary>
     /// Implementace podmínkového pravidla, které volí různé větve na základě podmínky.
+    /// <para>Implementation of a conditional rule choosing branches based on a predicate.</para>
     /// </summary>
     /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
     public class ConditionalRule<TInput> : Rule<TInput>, IConditionalRule<TInput>
@@ -80,6 +81,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
 
         /// <summary>
         /// Vyhodnotí pravidlo proti zadaným vstupním datům.
+        /// <para>Evaluates the rule against provided input and returns the result.</para>
         /// </summary>
         /// <param name="input">Vstupní data pro validaci.</param>
         /// <param name="context">Kontext vyhodnocení pravidla.</param>

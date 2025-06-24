@@ -5,6 +5,9 @@ using Ruleflow.NET.Engine.Validation.Enums;
 
 namespace Ruleflow.NET.Engine.Validation.Core.Results
 {
+    /// <summary>
+    /// Represents aggregated validation result containing all validation errors.
+    /// </summary>
     public class ValidationResult
     {
         private readonly List<ValidationError> _errors = new();
@@ -13,47 +16,79 @@ namespace Ruleflow.NET.Engine.Validation.Core.Results
         public bool IsValid => !_errors.Any(e => e.Severity >= ValidationSeverity.Error);
         public bool HasCriticalErrors => _errors.Any(e => e.Severity == ValidationSeverity.Critical);
 
+        /// <summary>
+        /// Přidá jednu chybovou zprávu do výsledku.
+        /// <para>Adds a single validation error to the result.</para>
+        /// </summary>
         public void AddError(ValidationError error)
         {
             if (error == null) throw new ArgumentNullException(nameof(error));
             _errors.Add(error);
         }
 
+        /// <summary>
+        /// Vytvoří a přidá chybovou zprávu podle zadaných parametrů.
+        /// <para>Creates and adds a validation error with the given information.</para>
+        /// </summary>
         public void AddError(string message, ValidationSeverity severity, string? code = null, object? context = null)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             _errors.Add(new ValidationError(message, severity, code, context));
         }
 
+        /// <summary>
+        /// Přidá do výsledku více chybových zpráv najednou.
+        /// <para>Adds multiple validation errors to the result.</para>
+        /// </summary>
         public void AddErrors(IEnumerable<ValidationError> errors)
         {
             if (errors == null) throw new NullReferenceException();
             foreach (var e in errors) AddError(e);
         }
 
+        /// <summary>
+        /// Vrátí chyby jen s danou úrovní závažnosti.
+        /// <para>Returns errors filtered by severity.</para>
+        /// </summary>
         public IEnumerable<ValidationError> GetErrorsBySeverity(ValidationSeverity severity)
         {
             return _errors.Where(e => e.Severity == severity);
         }
 
+        /// <summary>
+        /// Spustí akci pokud je výsledek validace úspěšný.
+        /// <para>Invokes the supplied action if the validation succeeded.</para>
+        /// </summary>
         public ValidationResult OnSuccess(Action action)
         {
             if (IsValid) action();
             return this;
         }
 
+        /// <summary>
+        /// Spustí akci s parametrem, pokud je výsledek validace úspěšný.
+        /// <para>Invokes the given action with the input when validation succeeded.</para>
+        /// </summary>
         public ValidationResult OnSuccess<T>(T input, Action<T> action)
         {
             if (IsValid) action(input);
             return this;
         }
 
+        /// <summary>
+        /// Spustí akci pokud validace neuspěla.
+        /// <para>Invokes the supplied action with collected errors when validation fails.</para>
+        /// </summary>
         public ValidationResult OnFailure(Action<IReadOnlyList<ValidationError>> action)
         {
             if (!IsValid) action(Errors);
             return this;
         }
 
+        /// <summary>
+        /// Vyhodí výjimku při neúspěšné validaci.
+        /// <para>Throws an exception when the result contains critical errors.</para>
+        /// </summary>
         public void ThrowIfInvalid()
         {
             if (!IsValid)
