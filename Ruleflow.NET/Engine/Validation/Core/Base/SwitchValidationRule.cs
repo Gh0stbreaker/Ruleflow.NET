@@ -5,6 +5,7 @@ using Ruleflow.NET.Engine.Validation.Enums;
 namespace Ruleflow.NET.Engine.Validation.Core.Base
 {
     public class SwitchValidationRule<T, TKey> : IdentifiableValidationRule<T>
+        where TKey : notnull
     {
         private readonly Func<T, TKey> _keySelector;
         private readonly Dictionary<TKey, IdentifiableValidationRule<T>> _cases;

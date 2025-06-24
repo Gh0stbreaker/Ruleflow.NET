@@ -91,6 +91,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
     /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
     /// <typeparam name="TKey">Typ klíče pro přepínání.</typeparam>
     public class SwitchRuleBuilder<TInput, TKey> : RuleBuilder<TInput, SwitchRuleBuilder<TInput, TKey>>
+        where TKey : notnull
     {
         private Func<TInput, Rule.Context.RuleContext, TKey>? _switchKeyFunc;
         private readonly Dictionary<TKey, IRule<TInput>> _cases = new Dictionary<TKey, IRule<TInput>>();
