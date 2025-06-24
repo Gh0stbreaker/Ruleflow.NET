@@ -251,7 +251,7 @@ Made with ❤️
 
 ### 🌟 Přehled
 
-Ruleflow.NET je flexibilní a výkonný rámec pro obchodní pravidla a validaci v .NET aplikacích. Díky moderním funkcím jazyka C# a přehlednému rozhraní Fluent API vám umožní vytvářet, spravovat a vykonávat složitou obchodní logiku a validační pravidla s minimem kódu a maximální čitelností.
+Ruleflow.NET je flexibilní a výkonný framework pro obchodní pravidla a validaci v .NET aplikacích. Díky moderním funkcím jazyka C# a přehlednému rozhraní Fluent API vám umožní vytvářet, spravovat a vykonávat složitou obchodní logiku a validační pravidla s minimem kódu a maximální čitelností.
 
 > ⚠️ **Poznámka:** Ruleflow.NET je momentálně aktivně vyvíjen. Ačkoli je základní funkčnost stabilní, některé vlastnosti se mohou před finálním vydáním změnit.
 
