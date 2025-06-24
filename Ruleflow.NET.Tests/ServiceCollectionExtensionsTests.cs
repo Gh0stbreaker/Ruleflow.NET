@@ -59,5 +59,30 @@ namespace Ruleflow.NET.Tests
             var context2 = provider.GetRequiredService<Ruleflow.NET.Engine.Validation.Core.Context.ValidationContext>();
             Assert.AreSame(context1, context2);
         }
+
+        [TestMethod]
+        public void AddRuleflow_RegisterDefaultValidator_AddsValidator()
+        {
+            var services = new ServiceCollection();
+            services.AddRuleflow<Person>(o => o.RegisterDefaultValidator = true);
+            var provider = services.BuildServiceProvider();
+
+            var validator1 = provider.GetRequiredService<IValidator<Person>>();
+            var validator2 = provider.GetRequiredService<IValidator<Person>>();
+
+            Assert.IsNotNull(validator1);
+            Assert.AreSame(validator1, validator2);
+        }
+
+        [TestMethod]
+        public void AddRuleflow_WithoutRegisterDefaultValidator_NoValidatorRegistered()
+        {
+            var services = new ServiceCollection();
+            services.AddRuleflow<Person>();
+            var provider = services.BuildServiceProvider();
+
+            var validator = provider.GetService<IValidator<Person>>();
+            Assert.IsNull(validator);
+        }
     }
 }
