@@ -236,7 +236,20 @@ Ruleflow.NET is designed around a set of core interfaces and components:
 - **Data Integrity Checks** - Ensure your data meets your business constraints
 
 ### 📋 Roadmap
-- [ ] Coming soon!
+- **Short-term goals (next release)**
+  1. Asynchronous rule evaluation (`IAsyncValidationRule`, `AsyncValidator`)
+  2. Integrated logging using `Microsoft.Extensions.Logging`
+  3. Configurable rule loading from JSON/YAML files
+
+- **Mid-term goals**
+  1. Persistent storage for the rule registry (e.g., SQLite/SQL Server/NoSQL)
+  2. Command-line interface for rule management
+  3. Extended asynchronous `EventHub` with integration to messaging systems
+
+- **Long-term goals**
+  1. Web interface for management and monitoring (e.g., Blazor)
+  2. Rule versioning with audit log of changes
+  3. Machine learning integration (connect to external ML models)
 
 ### 📚 Documentation
 
