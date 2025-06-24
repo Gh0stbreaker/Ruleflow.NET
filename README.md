@@ -21,6 +21,8 @@ Ruleflow.NET is a flexible, high-performance business rules and validation frame
 - **Comprehensive Results** - Get detailed validation results with configurable severity levels
 - **Dependency Awareness** - Built-in dependency graph validation to prevent circular references
 - **Clean Separation** - Keep your business logic separate from your application code
+- **Intelligent Rule References** - Use lightweight references that resolve rules from a registry when needed
+- **Flexible Data Mapping** - Convert dictionaries to objects and back using the built-in DataAutoMapper
 
 ### 🚀 Getting Started
 
@@ -135,6 +137,42 @@ var statusRule = RuleflowExtensions
     .Build();
 ```
 
+#### Data Mapping with DataAutoMapper
+
+```csharp
+// Define mapping rules
+var mapRules = new[]
+{
+    new DataMappingRule<Person>(p => p.Name, "name", DataType.String, true),
+    new DataMappingRule<Person>(p => p.Age, "age", DataType.Int32, true)
+};
+
+var mapper = new DataAutoMapper<Person>(mapRules);
+var context = new DataContext();
+
+var dictionary = new Dictionary<string, string>
+{
+    ["name"] = "John",
+    ["age"] = "30"
+};
+
+Person person = mapper.MapToObject(dictionary, context);
+```
+
+#### Working with Rule References
+
+```csharp
+var ruleRegistry = new RuleRegistry<Person>();
+ruleRegistry.RegisterRule(ageRule);
+
+IRuleReference<Person> reference = ageRule.Reference;
+
+if (reference.TryResolve(ruleRegistry, out var resolved))
+{
+    // Use resolved rule
+}
+```
+
 ### 🏗️ Architecture
 
 Ruleflow.NET is designed around a set of core interfaces and components:
@@ -145,6 +183,8 @@ Ruleflow.NET is designed around a set of core interfaces and components:
 - **`ValidationRuleBuilder<T>`** - Fluent API for constructing validation rules
 - **`DependencyAwareValidator<T>`** - Validator that supports rule dependencies
 - **`ValidationContext`** - Context for validation operations, including results of rule evaluations
+- **`DataAutoMapper<T>`** - Maps dictionary data to objects using typed values
+- **`RuleReference<T>`** - Lightweight reference that resolves rules from a registry
 
 ### 🌐 Use Cases
 
@@ -194,6 +234,8 @@ Ruleflow.NET je flexibilní a výkonný rámec pro obchodní pravidla a validaci
 - **Podrobné výsledky** – Získejte detailní validační výsledky s konfigurovatelnou závažností
 - **Vědomí závislostí** – Vestavěná kontrola grafu závislostí brání tvorbě cyklických odkazů
 - **Čisté oddělení** – Udržujte obchodní logiku oddělenou od aplikačního kódu
+- **Inteligentní odkazy na pravidla** – Práce s pravidly pomocí slabých referencí, které lze kdykoli vyřešit z registru
+- **Flexibilní mapování dat** – Převádějte slovníky na objekty a zpět díky vestavěnému DataAutoMapperu
 
 ### 🚀 Začínáme
 
@@ -308,6 +350,42 @@ var statusRule = RuleflowExtensions
     .Build();
 ```
 
+#### Mapování dat pomocí DataAutoMapperu
+
+```csharp
+// Definice mapovacích pravidel
+var mapovaciPravidla = new[]
+{
+    new DataMappingRule<Person>(p => p.Name, "name", DataType.String, true),
+    new DataMappingRule<Person>(p => p.Age, "age", DataType.Int32, true)
+};
+
+var mapper = new DataAutoMapper<Person>(mapovaciPravidla);
+var context = new DataContext();
+
+var slovnik = new Dictionary<string, string>
+{
+    ["name"] = "John",
+    ["age"] = "30"
+};
+
+Person osoba = mapper.MapToObject(slovnik, context);
+```
+
+#### Práce s odkazy na pravidla
+
+```csharp
+var registr = new RuleRegistry<Person>();
+registr.RegisterRule(ageRule);
+
+IRuleReference<Person> odkaz = ageRule.Reference;
+
+if (odkaz.TryResolve(registr, out var vyresene))
+{
+    // Použití vyřešeného pravidla
+}
+```
+
 ### 🏗️ Architektura
 
 Ruleflow.NET je postaven na sadě základních rozhraní a komponent:
@@ -318,6 +396,8 @@ Ruleflow.NET je postaven na sadě základních rozhraní a komponent:
 - **`ValidationRuleBuilder<T>`** – Fluent API pro tvorbu validačních pravidel
 - **`DependencyAwareValidator<T>`** – Validátor podporující závislosti mezi pravidly
 - **`ValidationContext`** – Kontext validačních operací včetně výsledků vyhodnocení pravidel
+- **`DataAutoMapper<T>`** – Mapuje data mezi slovníkem a objektem pomocí typovaných hodnot
+- **`RuleReference<T>`** – Slabá reference na pravidlo, kterou lze vyřešit z registru
 
 ### 🌐 Příklady použití
 
