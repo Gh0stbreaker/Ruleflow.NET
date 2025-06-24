@@ -34,9 +34,10 @@ namespace Ruleflow.NET.Tests
         [TestMethod]
         public void AddRuleflow_WithInitialRules_RegistersThem()
         {
-            var rule = RuleflowExtensions.CreateRule<Person>()
-                .WithAction(p => { if (p.Age < 18) throw new ArgumentException(); })
-                .WithSeverity(ValidationSeverity.Error)
+            var rule = Ruleflow.NET.Engine.Models.Rule.Builder.RuleBuilderFactory
+                .CreateSingleResponsibilityRuleBuilder<Person>()
+                .WithValidation((p, ctx) => p.Age >= 18)
+                .WithErrorMessage("Age must be at least 18")
                 .Build();
 
             var services = new ServiceCollection();

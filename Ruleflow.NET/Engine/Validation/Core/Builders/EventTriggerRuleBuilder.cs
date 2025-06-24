@@ -9,7 +9,7 @@ namespace Ruleflow.NET.Engine.Validation.Core.Builders
         private string _id = Guid.NewGuid().ToString();
         private string? _eventName;
         private int _priority;
-        private ValidationSeverity _severity = ValidationSeverity.Info;
+        private ValidationSeverity _severity = ValidationSeverity.Information;
 
         public EventTriggerRuleBuilder<T> WithId(string id) { _id = id; return this; }
         public EventTriggerRuleBuilder<T> WithEvent(string eventName) { _eventName = eventName; return this; }

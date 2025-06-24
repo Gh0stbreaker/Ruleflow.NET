@@ -9,7 +9,7 @@ namespace Ruleflow.NET.Engine.Validation.Core.Base
     public class EventTriggerValidationRule<T> : IdentifiableValidationRule<T>
     {
         private readonly string _eventName;
-        public override ValidationSeverity DefaultSeverity => ValidationSeverity.Info;
+        public override ValidationSeverity DefaultSeverity => ValidationSeverity.Information;
 
         public EventTriggerValidationRule(string id, string eventName) : base(id)
         {
