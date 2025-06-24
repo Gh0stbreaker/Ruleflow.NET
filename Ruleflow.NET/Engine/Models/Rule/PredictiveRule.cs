@@ -1,7 +1,7 @@
 ﻿using Ruleflow.NET.Engine.Models.Evaluation;
 using Ruleflow.NET.Engine.Models.Rule.Context;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
-using Ruleflow.NET.Engine.Models.Rule.Type;
+using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -47,7 +47,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Implementation
         /// <param name="timestamp">Časová značka vytvoření pravidla.</param>
         public PredictiveRule(
             int id,
-            RuleType type,
+            IRuleType<TInput> type,
             PredictDelegate predictFunc,
             IEnumerable<THistoryData>? initialHistoricalData = null,
             string? ruleId = null,

@@ -1,6 +1,6 @@
 ﻿using Ruleflow.NET.Engine.Models.Rule;
 using Ruleflow.NET.Engine.Models.Rule.Context;
-using Ruleflow.NET.Engine.Models.Rule.Type;
+using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 
 namespace Ruleflow.NET.Engine.Models.Rule.Builder.Interface
 {
@@ -52,7 +52,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder.Interface
         /// </summary>
         /// <param name="type">Typ pravidla.</param>
         /// <returns>Instance builderu pro řetězení.</returns>
-        TBuilder WithType(RuleType type);
+        TBuilder WithType(IRuleType<TInput> type);
 
         /// <summary>
         /// Sestaví a vrátí pravidlo podle nastavené konfigurace.

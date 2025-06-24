@@ -1,5 +1,4 @@
-﻿using Ruleflow.NET.Engine.Models.Rule.Type;
-using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
+﻿using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 using System.Text;
 using Ruleflow.NET.Engine.Models.Rule.Reference;
 
@@ -13,7 +12,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
     /// <typeparam name="TInput">Typ dat, která budou validována. / Type of the input being validated.</typeparam>
     public class Rule<TInput>(
         int id,
-        RuleType type,
+        IRuleType<TInput> type,
         string? ruleId = null,
         string? name = null,
         string? description = null,
@@ -64,7 +63,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
         public DateTimeOffset Timestamp { get; } = timestamp?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
 
         public int RuleTypeId { get; } = type.Id;
-        public IRuleType Type { get; } = type ?? throw new ArgumentNullException(nameof(type));
+        public IRuleType<TInput> Type { get; } = type ?? throw new ArgumentNullException(nameof(type));
         public RuleReference<TInput> Reference => new RuleReference<TInput>(this);
 
         public override string ToString()

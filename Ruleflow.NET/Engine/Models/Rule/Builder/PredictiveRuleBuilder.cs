@@ -1,6 +1,6 @@
 ﻿using Ruleflow.NET.Engine.Models.Rule.Implementation;
 using Ruleflow.NET.Engine.Models.Rule.Builder.Interface;
-using Ruleflow.NET.Engine.Models.Rule.Type;
+using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 using System.Collections.Generic;
 using Ruleflow.NET.Engine.Models.Rule;
 
@@ -21,7 +21,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// </summary>
         /// <param name="id">ID pravidla.</param>
         /// <param name="type">Typ pravidla.</param>
-        public PredictiveRuleBuilder(int id, RuleType type) : base(id, type)
+        public PredictiveRuleBuilder(int id, IRuleType<TInput> type) : base(id, type)
         {
         }
 

@@ -1,7 +1,7 @@
 ﻿using Ruleflow.NET.Engine.Models.Rule;
 using Ruleflow.NET.Engine.Models.Rule.Builder.Interface;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
-using Ruleflow.NET.Engine.Models.Rule.Type;
+using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 
 namespace Ruleflow.NET.Engine.Models.Rule.Builder
 {
@@ -20,7 +20,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// </summary>
         /// <param name="id">ID pravidla.</param>
         /// <param name="type">Typ pravidla.</param>
-        public ConditionalRuleBuilder(int id, RuleType type) : base(id, type)
+        public ConditionalRuleBuilder(int id, IRuleType<TInput> type) : base(id, type)
         {
         }
 
