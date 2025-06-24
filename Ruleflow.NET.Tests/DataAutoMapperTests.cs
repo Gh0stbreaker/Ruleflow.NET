@@ -64,5 +64,60 @@ namespace Ruleflow.NET.Tests
             Assert.AreEqual(25, data["age"].Value);
             Assert.AreEqual(2, context.Values.Count);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(DataMappingException))]
+        public void MapToObject_InvalidConversion_Throws()
+        {
+            var rules = new[]
+            {
+                new DataMappingRule<Person>(p => p.Name, "name", DataType.String, true),
+                new DataMappingRule<Person>(p => p.Age, "age", DataType.Int32, true)
+            };
+
+            var mapper = new DataAutoMapper<Person>(rules);
+            var context = new DataContext();
+
+            var data = new Dictionary<string, string> { { "name", "John" }, { "age", "not-number" } };
+
+            mapper.MapToObject(data, context);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(DataMappingException))]
+        public void MapToData_RequiredPropertyNull_Throws()
+        {
+            var rules = new[]
+            {
+                new DataMappingRule<Person>(p => p.Name, "name", DataType.String, true),
+                new DataMappingRule<Person>(p => p.Age, "age", DataType.Int32, true)
+            };
+
+            var mapper = new DataAutoMapper<Person>(rules);
+            var context = new DataContext();
+
+            var person = new Person { Name = null!, Age = 0 };
+            mapper.MapToData(person, context);
+        }
+
+        [TestMethod]
+        public void MapToData_OptionalPropertyNull_Ignored()
+        {
+            var rules = new[]
+            {
+                new DataMappingRule<Person>(p => p.Name, "name", DataType.String, false),
+                new DataMappingRule<Person>(p => p.Age, "age", DataType.Int32, true)
+            };
+
+            var mapper = new DataAutoMapper<Person>(rules);
+            var context = new DataContext();
+
+            var person = new Person { Name = null!, Age = 30 };
+            var data = mapper.MapToData(person, context);
+
+            Assert.IsFalse(data.ContainsKey("name"));
+            Assert.AreEqual(30, data["age"].Value);
+            Assert.AreEqual(1, context.Values.Count);
+        }
     }
 }
