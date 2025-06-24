@@ -101,7 +101,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Implementation
         /// <param name="input">Vstupní data pro validaci.</param>
         /// <param name="context">Kontext vyhodnocení pravidla.</param>
         /// <returns>Výsledek vyhodnocení pravidla.</returns>
-        public RuleEvaluationResult<TInput> Evaluate(TInput input, RuleContext context)
+        public override RuleEvaluationResult<TInput> Evaluate(TInput input, RuleContext context)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
