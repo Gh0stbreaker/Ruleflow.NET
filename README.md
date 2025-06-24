@@ -23,6 +23,9 @@ Ruleflow.NET is a flexible, high-performance business rules and validation frame
 - **Clean Separation** - Keep your business logic separate from your application code
 - **Intelligent Rule References** - Use lightweight references that resolve rules from a registry when needed
 - **Flexible Data Mapping** - Convert dictionaries to objects and back using the built-in DataAutoMapper
+- **Batch Validation** - Validate collections of inputs with `BatchValidator`
+- **Composite Validators** - Merge results from multiple validators using `CompositeValidator`
+- **Shared Validation Context** - Pass data and rule results between rules via `ValidationContext`
 
 ### 🚀 Getting Started
 
@@ -173,6 +176,31 @@ if (reference.TryResolve(ruleRegistry, out var resolved))
 }
 ```
 
+#### Batch Validation
+
+```csharp
+var quantityRule = RuleflowExtensions.CreateRule<Item>()
+    .WithAction(i =>
+    {
+        if (i.Quantity <= 0)
+            throw new ArgumentException("Quantity must be positive");
+    })
+    .Build();
+
+var batchValidator = new BatchValidator<Item>(new[] { quantityRule });
+var result = batchValidator.CollectValidationResults(items);
+```
+
+#### Combining Validators
+
+```csharp
+var nameValidator = new Validator<Customer>(new[] { nameRule });
+var emailValidator = new Validator<Customer>(new[] { emailRule });
+
+var composite = new CompositeValidator<Customer>(new[] { nameValidator, emailValidator });
+var validation = composite.CollectValidationResults(customer);
+```
+
 ### 🏗️ Architecture
 
 Ruleflow.NET is designed around a set of core interfaces and components:
@@ -183,6 +211,8 @@ Ruleflow.NET is designed around a set of core interfaces and components:
 - **`ValidationRuleBuilder<T>`** - Fluent API for constructing validation rules
 - **`DependencyAwareValidator<T>`** - Validator that supports rule dependencies
 - **`ValidationContext`** - Context for validation operations, including results of rule evaluations
+- **`BatchValidator<T>`** - Processes lists of inputs and aggregates all errors
+- **`CompositeValidator<T>`** - Combines multiple validators into one
 - **`DataAutoMapper<T>`** - Maps dictionary data to objects using typed values
 - **`RuleReference<T>`** - Lightweight reference that resolves rules from a registry
 
@@ -236,6 +266,9 @@ Ruleflow.NET je flexibilní a výkonný rámec pro obchodní pravidla a validaci
 - **Čisté oddělení** – Udržujte obchodní logiku oddělenou od aplikačního kódu
 - **Inteligentní odkazy na pravidla** – Práce s pravidly pomocí slabých referencí, které lze kdykoli vyřešit z registru
 - **Flexibilní mapování dat** – Převádějte slovníky na objekty a zpět díky vestavěnému DataAutoMapperu
+- **Dávková validace** – Ověřujte kolekce vstupů pomocí `BatchValidator`
+- **Kompozitní validátory** – Spojujte výsledky vícero validátorů pomocí `CompositeValidator`
+- **Sdílený validační kontext** – Předávejte data a výsledky pravidel přes `ValidationContext`
 
 ### 🚀 Začínáme
 
@@ -386,6 +419,31 @@ if (odkaz.TryResolve(registr, out var vyresene))
 }
 ```
 
+#### Dávková validace
+
+```csharp
+var pravidlo = RuleflowExtensions.CreateRule<Item>()
+    .WithAction(i =>
+    {
+        if (i.Quantity <= 0)
+            throw new ArgumentException("Množství musí být kladné");
+    })
+    .Build();
+
+var davkovac = new BatchValidator<Item>(new[] { pravidlo });
+var vysledek = davkovac.CollectValidationResults(polozky);
+```
+
+#### Kombinace validátorů
+
+```csharp
+var jmenoValidator = new Validator<Customer>(new[] { jmenoPravidlo });
+var emailValidator = new Validator<Customer>(new[] { emailPravidlo });
+
+var composite = new CompositeValidator<Customer>(new[] { jmenoValidator, emailValidator });
+var validace = composite.CollectValidationResults(zakaznik);
+```
+
 ### 🏗️ Architektura
 
 Ruleflow.NET je postaven na sadě základních rozhraní a komponent:
@@ -396,6 +454,8 @@ Ruleflow.NET je postaven na sadě základních rozhraní a komponent:
 - **`ValidationRuleBuilder<T>`** – Fluent API pro tvorbu validačních pravidel
 - **`DependencyAwareValidator<T>`** – Validátor podporující závislosti mezi pravidly
 - **`ValidationContext`** – Kontext validačních operací včetně výsledků vyhodnocení pravidel
+- **`BatchValidator<T>`** – Zpracuje seznamy vstupů a agreguje chyby
+- **`CompositeValidator<T>`** – Umožňuje kombinovat více validátorů do jednoho
 - **`DataAutoMapper<T>`** – Mapuje data mezi slovníkem a objektem pomocí typovaných hodnot
 - **`RuleReference<T>`** – Slabá reference na pravidlo, kterou lze vyřešit z registru
 
