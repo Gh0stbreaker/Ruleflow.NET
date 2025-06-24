@@ -290,8 +290,8 @@ namespace Ruleflow.NET.Tests
             // Medium priority switch rule
             var mediumPriorityRule = RuleflowExtensions
                 .CreateSwitchRule<Product, bool>(p => p.IsDiscounted)
+                .WithPriority(5)
                 .Case(true, builder => builder
-                    .WithPriority(5)
                     .WithAction(p => {
                         executionTracker.Add("MediumPriority");
                     })
