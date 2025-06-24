@@ -5,6 +5,12 @@ using Ruleflow.NET.Engine.Validation.Enums;
 
 namespace Ruleflow.NET.Engine.Validation.Core.Builders
 {
+    /// <summary>
+    /// Builder pro switch pravidlo volící podpravidlo dle klíče.
+    /// <para>Builder for a switch rule that selects sub-rules by key.</para>
+    /// </summary>
+    /// <typeparam name="T">Typ vstupu.</typeparam>
+    /// <typeparam name="TKey">Typ klíče.</typeparam>
     public class SwitchRuleBuilder<T, TKey>
         where TKey : notnull
     {
@@ -21,9 +27,27 @@ namespace Ruleflow.NET.Engine.Validation.Core.Builders
             _selector = selector;
         }
 
+        /// <summary>
+        /// Nastaví identifikátor výsledného pravidla.
+        /// <para>Sets the identifier of the resulting rule.</para>
+        /// </summary>
         public SwitchRuleBuilder<T, TKey> WithId(string id) { _id = id; return this; }
+
+        /// <summary>
+        /// Nastaví prioritu pravidla.
+        /// <para>Sets rule priority.</para>
+        /// </summary>
         public SwitchRuleBuilder<T, TKey> WithPriority(int p) { _priority = p; return this; }
+
+        /// <summary>
+        /// Nastaví závažnost při selhání.
+        /// <para>Sets failure severity.</para>
+        /// </summary>
         public SwitchRuleBuilder<T, TKey> WithSeverity(ValidationSeverity s) { _severity = s; return this; }
+        /// <summary>
+        /// Definuje případ pro konkrétní klíč.
+        /// <para>Defines a case for a specific key.</para>
+        /// </summary>
         public SwitchRuleBuilder<T, TKey> Case(TKey key, Action<SimpleRuleBuilder<T>> cfg)
         {
             var b = new SimpleRuleBuilder<T>();
@@ -31,6 +55,11 @@ namespace Ruleflow.NET.Engine.Validation.Core.Builders
             _cases[key] = b;
             return this;
         }
+
+        /// <summary>
+        /// Definuje výchozí případ.
+        /// <para>Defines the default case.</para>
+        /// </summary>
         public SwitchRuleBuilder<T, TKey> Default(Action<SimpleRuleBuilder<T>> cfg)
         {
             _defaultBuilder = new SimpleRuleBuilder<T>();
@@ -39,6 +68,10 @@ namespace Ruleflow.NET.Engine.Validation.Core.Builders
             return this;
         }
 
+        /// <summary>
+        /// Vytvoří switch pravidlo z nadefinovaných případů.
+        /// <para>Builds the switch rule from configured cases.</para>
+        /// </summary>
         public SwitchValidationRule<T, TKey> Build()
         {
             var builtCases = new Dictionary<TKey, IdentifiableValidationRule<T>>();
