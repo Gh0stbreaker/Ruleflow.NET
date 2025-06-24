@@ -1,5 +1,5 @@
 ﻿using Ruleflow.NET.Engine.Models.Rule.Builder.Interface;
-using Ruleflow.NET.Engine.Models.Rule.Type;
+using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 
 namespace Ruleflow.NET.Engine.Models.Rule.Builder
 {
@@ -19,9 +19,9 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         protected int Priority { get; set; }
         protected bool IsActive { get; set; } = true;
         protected DateTimeOffset? Timestamp { get; set; }
-        protected RuleType Type { get; set; }
+        protected IRuleType<TInput> Type { get; set; }
 
-        protected RuleBuilder(int id, RuleType type)
+        protected RuleBuilder(int id, IRuleType<TInput> type)
         {
             Id = id;
             Type = type ?? throw new ArgumentNullException(nameof(type));
@@ -98,7 +98,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// </summary>
         /// <param name="type">Typ pravidla.</param>
         /// <returns>Instance builderu pro řetězení.</returns>
-        public TBuilder WithType(RuleType type)
+        public TBuilder WithType(IRuleType<TInput> type)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             return (TBuilder)this;

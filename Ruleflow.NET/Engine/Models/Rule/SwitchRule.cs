@@ -1,7 +1,7 @@
 ﻿using Ruleflow.NET.Engine.Models.Evaluation;
 using Ruleflow.NET.Engine.Models.Rule.Context;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
-using Ruleflow.NET.Engine.Models.Rule.Type;
+using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -51,7 +51,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
         /// <param name="timestamp">Časová značka vytvoření pravidla.</param>
         public SwitchRule(
             int id,
-            RuleType type,
+            IRuleType<TInput> type,
             SwitchKeyDelegate switchKeyFunc,
             IRule<TInput>? defaultCase = null,
             IDictionary<object, IRule<TInput>>? initialCases = null,

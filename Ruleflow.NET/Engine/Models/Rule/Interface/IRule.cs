@@ -54,7 +54,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Interface
         /// <summary>
         /// Typ pravidla.
         /// </summary>
-        IRuleType Type { get; }
+        IRuleType<TInput> Type { get; }
 
         /// <summary>
         /// Vyhodnotí pravidlo proti zadaným vstupním datům.

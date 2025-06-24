@@ -1,7 +1,6 @@
 ﻿using Ruleflow.NET.Engine.Models.Evaluation;
 using Ruleflow.NET.Engine.Models.Rule.Context;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
-using Ruleflow.NET.Engine.Models.Rule.Type;
 using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 using System;
 using System.Collections.Generic;

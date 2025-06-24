@@ -1,7 +1,7 @@
 ﻿using Ruleflow.NET.Engine.Models.Evaluation;
 using Ruleflow.NET.Engine.Models.Rule.Context;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
-using Ruleflow.NET.Engine.Models.Rule.Type;
+using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +48,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
         /// <param name="timestamp">Časová značka vytvoření pravidla.</param>
         public DependentRule(
             int id,
-            RuleType type,
+            IRuleType<TInput> type,
             EvaluateDependenciesDelegate evaluateFunc,
             IEnumerable<IRule<TInput>>? initialDependencies = null,
             string? ruleId = null,

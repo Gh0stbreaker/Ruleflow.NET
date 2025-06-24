@@ -1,5 +1,5 @@
 ﻿using Ruleflow.NET.Engine.Models.Rule.Builder.Interface;
-using Ruleflow.NET.Engine.Models.Rule.Type;
+using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 using System;
 
 namespace Ruleflow.NET.Engine.Models.Rule.Builder
@@ -18,7 +18,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// </summary>
         /// <param name="id">Identifikátor pravidla.</param>
         /// <param name="type">Typ pravidla.</param>
-        public TimeBasedRuleBuilder(int id, RuleType type) : base(id, type)
+        public TimeBasedRuleBuilder(int id, IRuleType<TInput> type) : base(id, type)
         {
         }
 
