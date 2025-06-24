@@ -11,31 +11,31 @@ namespace Ruleflow.NET.Engine.Models.Rule.Group.Interface
         /// <summary>
         /// Unikátní identifikátor typu skupiny.
         /// </summary>
-        new int Id { get; }
+        int Id { get; }
 
         /// <summary>
         /// Kód typu skupiny (zkratka).
         /// </summary>
-        new string Code { get; }
+        string Code { get; }
 
         /// <summary>
         /// Název typu skupiny.
         /// </summary>
-        new string Name { get; }
+        string Name { get; }
 
         /// <summary>
         /// Volitelný popis typu skupiny.
         /// </summary>
-        new string? Description { get; }
+        string? Description { get; }
 
         /// <summary>
         /// Indikuje, zda je typ skupiny aktivní.
         /// </summary>
-        new bool IsEnabled { get; }
+        bool IsEnabled { get; }
 
         /// <summary>
         /// Datum a čas vytvoření typu skupiny.
         /// </summary>
-        new DateTimeOffset CreatedAt { get; }
+        DateTimeOffset CreatedAt { get; }
     }
 }
