@@ -4,6 +4,11 @@ using Ruleflow.NET.Engine.Validation.Enums;
 
 namespace Ruleflow.NET.Engine.Validation.Core.Builders
 {
+    /// <summary>
+    /// Builder pro tvorbu podmíněného pravidla.
+    /// <para>Builder used to create a conditional validation rule.</para>
+    /// </summary>
+    /// <typeparam name="T">Typ vstupu.</typeparam>
     public class ConditionalRuleBuilder<T>
     {
         private readonly Func<T, bool> _condition;
@@ -20,12 +25,40 @@ namespace Ruleflow.NET.Engine.Validation.Core.Builders
             _condition = condition;
         }
 
+        /// <summary>
+        /// Nastaví identifikátor pravidla.
+        /// <para>Sets the identifier of the resulting rule.</para>
+        /// </summary>
         public ConditionalRuleBuilder<T> WithId(string id) { _id = id; return this; }
+
+        /// <summary>
+        /// Nastaví prioritu pravidla.
+        /// <para>Sets the priority of the rule.</para>
+        /// </summary>
         public ConditionalRuleBuilder<T> WithPriority(int p) { _priority = p; return this; }
+
+        /// <summary>
+        /// Nastaví závažnost selhání.
+        /// <para>Sets the failure severity.</para>
+        /// </summary>
         public ConditionalRuleBuilder<T> WithSeverity(ValidationSeverity s) { _severity = s; return this; }
+
+        /// <summary>
+        /// Definuje větev THEN.
+        /// <para>Defines the THEN branch.</para>
+        /// </summary>
         public ConditionalRuleBuilder<T> Then(Action<SimpleRuleBuilder<T>> cfg) { _hasThen=true; cfg(_thenBuilder); return this; }
+
+        /// <summary>
+        /// Definuje větev ELSE.
+        /// <para>Defines the ELSE branch.</para>
+        /// </summary>
         public ConditionalRuleBuilder<T> Else(Action<SimpleRuleBuilder<T>> cfg) { _hasElse=true; cfg(_elseBuilder); return this; }
 
+        /// <summary>
+        /// Vytvoří instanci podmíněného pravidla.
+        /// <para>Builds the conditional validation rule.</para>
+        /// </summary>
         public ConditionalValidationRule<T> Build()
         {
             var thenRule = _hasThen ? _thenBuilder.Build() : null;
