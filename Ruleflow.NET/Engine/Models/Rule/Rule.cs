@@ -1,6 +1,7 @@
 ﻿using Ruleflow.NET.Engine.Models.Rule.Type;
 using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 using System.Text;
+using Ruleflow.NET.Engine.Models.Rule.Reference;
 
 namespace Ruleflow.NET.Engine.Models.Rule
 {
@@ -64,6 +65,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
 
         public int RuleTypeId { get; } = type.Id;
         public IRuleType Type { get; } = type ?? throw new ArgumentNullException(nameof(type));
+        public RuleReference<TInput> Reference => new RuleReference<TInput>(this);
 
         public override string ToString()
         {
