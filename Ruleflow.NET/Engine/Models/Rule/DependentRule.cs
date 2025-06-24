@@ -11,6 +11,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
 {
     /// <summary>
     /// Implementace pravidla závislého na výsledcích jiných pravidel.
+    /// <para>Rule implementation that depends on the results of other rules.</para>
     /// </summary>
     /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
     public class DependentRule<TInput> : Rule<TInput>, IDependentRule<TInput>
@@ -71,6 +72,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
 
         /// <summary>
         /// Přidá závislost na jiném pravidle.
+        /// <para>Adds another rule as a dependency for this rule.</para>
         /// </summary>
         /// <param name="rule">Pravidlo, na kterém závisí toto pravidlo.</param>
         public void AddDependency(IRule<TInput> rule)
@@ -83,6 +85,7 @@ namespace Ruleflow.NET.Engine.Models.Rule
 
         /// <summary>
         /// Vyhodnotí pravidlo proti zadaným vstupním datům.
+        /// <para>Evaluates this rule after executing all dependent rules.</para>
         /// </summary>
         /// <param name="input">Vstupní data pro validaci.</param>
         /// <param name="context">Kontext vyhodnocení pravidla.</param>

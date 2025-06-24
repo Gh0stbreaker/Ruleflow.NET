@@ -6,6 +6,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Context
     /// <summary>
     /// Základní kontext pro sdílení pravidla.
     /// Uchovává metadata i uživatelské parametry.
+    /// <para>Base context used when sharing a rule. Holds rule metadata and user parameters.</para>
     /// </summary>
     public class RuleContext
     {
@@ -25,6 +26,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Context
 
         /// <summary>
         /// Přidá nebo aktualizuje parametr v kontextu.
+        /// <para>Adds or updates a parameter value in the context.</para>
         /// </summary>
         public void AddParameter(string key, object value)
             => _parameters[key] = value;
@@ -43,6 +45,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Context
 
     /// <summary>
     /// Specializovaný kontext, který automaticky přidá metadata z pravidla.
+    /// <para>Specialized context that populates basic metadata from the provided rule.</para>
     /// </summary>
     public class RuleContext<TInput> : RuleContext
     {

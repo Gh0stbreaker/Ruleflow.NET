@@ -5,6 +5,9 @@ using Ruleflow.NET.Engine.Validation.Interfaces;
 
 namespace Ruleflow.NET.Engine.Validation.Core.Validators
 {
+    /// <summary>
+    /// Aggregates multiple validators and combines their results.
+    /// </summary>
     public class CompositeValidator<T> : IValidator<T>
     {
         private readonly List<IValidator<T>> _validators;
@@ -14,6 +17,9 @@ namespace Ruleflow.NET.Engine.Validation.Core.Validators
             _validators = validators.ToList();
         }
 
+        /// <summary>
+        /// Executes all nested validators and merges their results into one object.
+        /// </summary>
         public ValidationResult CollectValidationResults(T input)
         {
             var result = new ValidationResult();

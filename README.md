@@ -159,6 +159,12 @@ Ruleflow.NET is designed around a set of core interfaces and components:
 
 Comprehensive documentation is in progress and will be available soon.
 
+## 📝 Code Comments
+
+The source code now contains detailed XML comments in both Czech and English. These
+comments explain the purpose of each class and method to help new contributors
+understand how the framework works.
+
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to submit issues or pull requests to help improve Ruleflow.NET.

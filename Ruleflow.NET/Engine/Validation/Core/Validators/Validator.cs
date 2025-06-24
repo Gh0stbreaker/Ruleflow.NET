@@ -8,6 +8,9 @@ using Ruleflow.NET.Engine.Validation.Interfaces;
 
 namespace Ruleflow.NET.Engine.Validation.Core.Validators
 {
+    /// <summary>
+    /// Basic validator that executes a list of rules sequentially.
+    /// </summary>
     public class Validator<T> : IValidator<T>
     {
         private readonly List<IValidationRule<T>> _rules;
@@ -17,6 +20,9 @@ namespace Ruleflow.NET.Engine.Validation.Core.Validators
             _rules = rules.ToList();
         }
 
+        /// <summary>
+        /// Executes all configured rules and collects their validation results.
+        /// </summary>
         public ValidationResult CollectValidationResults(T input)
         {
             var context = ValidationContext.Instance;
@@ -49,6 +55,9 @@ namespace Ruleflow.NET.Engine.Validation.Core.Validators
             CollectValidationResults(input).ThrowIfInvalid();
         }
 
+        /// <summary>
+        /// Validates the input and, if successful, invokes the provided processing action.
+        /// </summary>
         public ValidationResult ValidateAndProcess(T input, Action<T> processingAction)
         {
             var res = CollectValidationResults(input);
@@ -57,6 +66,9 @@ namespace Ruleflow.NET.Engine.Validation.Core.Validators
             return res;
         }
 
+        /// <summary>
+        /// Validates the input and executes either success or failure action based on the result.
+        /// </summary>
         public void ValidateAndExecute(T input, Action successAction, Action<IReadOnlyList<ValidationError>> failureAction)
         {
             var res = CollectValidationResults(input);
