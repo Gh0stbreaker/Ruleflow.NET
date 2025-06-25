@@ -8,6 +8,8 @@ using Ruleflow.NET.Engine.Models.Rule.Group;
 using Ruleflow.NET.Engine.Models.Rule.Group.Interface;
 using Ruleflow.NET.Engine.Registry.Interface;
 using Ruleflow.NET.Engine.Models.Rule;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Ruleflow.NET.Engine.Registry
 {
@@ -74,6 +76,8 @@ namespace Ruleflow.NET.Engine.Registry
             { false, new List<IRuleGroupType<TInput>>() }
         };
 
+        private readonly ILogger<RuleRegistry<TInput>> _logger;
+
         #endregion
 
         #region Vlastnosti registru
@@ -110,7 +114,7 @@ namespace Ruleflow.NET.Engine.Registry
         /// <summary>
         /// Vytvoří novou instanci rozšířeného registru pravidel.
         /// </summary>
-        public RuleRegistry()
+        public RuleRegistry() : this(Array.Empty<IRule<TInput>>(), null)
         {
         }
 
@@ -118,8 +122,9 @@ namespace Ruleflow.NET.Engine.Registry
         /// Vytvoří novou instanci rozšířeného registru pravidel s počátečními pravidly.
         /// </summary>
         /// <param name="initialRules">Počáteční pravidla, která budou registrována.</param>
-        public RuleRegistry(IEnumerable<IRule<TInput>> initialRules)
+        public RuleRegistry(IEnumerable<IRule<TInput>> initialRules, ILogger<RuleRegistry<TInput>>? logger = null)
         {
+            _logger = logger ?? NullLogger<RuleRegistry<TInput>>.Instance;
             if (initialRules != null)
             {
                 foreach (var rule in initialRules)
@@ -141,10 +146,18 @@ namespace Ruleflow.NET.Engine.Registry
         public bool RegisterRule(IRule<TInput> rule)
         {
             if (rule == null)
+            {
+                _logger.LogError("Attempted to register null rule");
                 throw new ArgumentNullException(nameof(rule));
+            }
 
             if (_rulesById.ContainsKey(rule.RuleId))
+            {
+                _logger.LogWarning("Rule with id {RuleId} already exists", rule.RuleId);
                 return false;
+            }
+
+            _logger.LogInformation("Registering rule {RuleId}", rule.RuleId);
 
             // Přidání do základního úložiště
             _rulesById[rule.RuleId] = rule;
@@ -194,7 +207,12 @@ namespace Ruleflow.NET.Engine.Registry
                 throw new ArgumentException("ID pravidla nemůže být prázdné.", nameof(ruleId));
 
             if (!_rulesById.TryGetValue(ruleId, out var rule))
+            {
+                _logger.LogWarning("Rule {RuleId} not found for unregistration", ruleId);
                 return false;
+            }
+
+            _logger.LogInformation("Unregistering rule {RuleId}", ruleId);
 
             // Odstranění ze základního úložiště
             _rulesById.Remove(ruleId);
@@ -227,6 +245,7 @@ namespace Ruleflow.NET.Engine.Registry
             // Odstranění z indexu podle aktivního stavu
             _rulesByActiveStatus[rule.IsActive].Remove(rule);
 
+            _logger.LogInformation("Rule {RuleId} unregistered", ruleId);
             return true;
         }
 

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Ruleflow.NET.Engine.Events;
 using Ruleflow.NET.Engine.Extensions;
 using Ruleflow.NET.Engine.Models.Rule.Builder;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
@@ -40,35 +43,41 @@ namespace Ruleflow.NET.Extensions
 
             services.AddSingleton(options);
 
-            var registry = new RuleRegistry<TInput>(options.InitialRules ?? Array.Empty<IRule<TInput>>());
-
-            // Load attribute based validation rules if requested
-            if (options.AutoRegisterAttributeRules)
+            services.AddSingleton<IRuleRegistry<TInput>>(sp =>
             {
-                foreach (var vr in LoadAttributeRules(options))
+                var loggerFactory = sp.GetService<ILoggerFactory>() ?? NullLoggerFactory.Instance;
+                var logger = loggerFactory.CreateLogger<RuleRegistry<TInput>>();
+                var reg = new RuleRegistry<TInput>(options.InitialRules ?? Array.Empty<IRule<TInput>>(), logger);
+
+                // Load attribute based validation rules if requested
+                if (options.AutoRegisterAttributeRules)
                 {
-                    var wrapper = RuleBuilderFactory.CreateUnifiedRuleBuilder<TInput>()
-                        .WithRuleId(vr.Id)
-                        .WithPriority(vr.Priority)
-                        .WithValidation((input, ctx) =>
-                        {
-                            try
+                    foreach (var vr in LoadAttributeRules(options))
+                    {
+                        var wrapper = RuleBuilderFactory.CreateUnifiedRuleBuilder<TInput>()
+                            .WithRuleId(vr.Id)
+                            .WithPriority(vr.Priority)
+                            .WithValidation((input, ctx) =>
                             {
-                                vr.Validate(input);
-                                return true;
-                            }
-                            catch
-                            {
-                                return false;
-                            }
-                        })
-                        .Build();
+                                try
+                                {
+                                    vr.Validate(input);
+                                    return true;
+                                }
+                                catch
+                                {
+                                    return false;
+                                }
+                            })
+                            .Build();
 
-                    registry.RegisterRule(wrapper);
+                        reg.RegisterRule(wrapper);
+                    }
                 }
-            }
 
-            services.AddSingleton<IRuleRegistry<TInput>>(registry);
+                EventHub.SetLogger(loggerFactory.CreateLogger<EventHub.EventHubLog>());
+                return reg;
+            });
 
             var mappingRules = new List<DataMappingRule<TInput>>();
             if (options.AutoRegisterMappings)
@@ -100,7 +109,9 @@ namespace Ruleflow.NET.Extensions
                     }
                     foreach (var profile in profiles)
                         validationRules.AddRange(profile.ValidationRules);
-                    return new Validator<TInput>(validationRules);
+                    var loggerFactory = sp.GetService<ILoggerFactory>() ?? NullLoggerFactory.Instance;
+                    var logger = loggerFactory.CreateLogger<Validator<TInput>>();
+                    return new Validator<TInput>(validationRules, logger);
                 });
             }
 
