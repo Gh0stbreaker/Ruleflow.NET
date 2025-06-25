@@ -5,6 +5,8 @@ using Ruleflow.NET.Engine.Validation.Core.Base;
 using Ruleflow.NET.Engine.Validation.Core.Context;
 using Ruleflow.NET.Engine.Validation.Core.Results;
 using Ruleflow.NET.Engine.Validation.Interfaces;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Ruleflow.NET.Engine.Validation.Core.Validators
 {
@@ -14,10 +16,12 @@ namespace Ruleflow.NET.Engine.Validation.Core.Validators
     public class Validator<T> : IValidator<T>
     {
         private readonly List<IValidationRule<T>> _rules;
+        private readonly ILogger<Validator<T>> _logger;
 
-        public Validator(IEnumerable<IValidationRule<T>> rules)
+        public Validator(IEnumerable<IValidationRule<T>> rules, ILogger<Validator<T>>? logger = null)
         {
             _rules = rules.ToList();
+            _logger = logger ?? NullLogger<Validator<T>>.Instance;
         }
 
         /// <summary>
@@ -25,6 +29,7 @@ namespace Ruleflow.NET.Engine.Validation.Core.Validators
         /// </summary>
         public ValidationResult CollectValidationResults(T input)
         {
+            _logger.LogInformation("Starting validation of {InputType}", typeof(T).Name);
             var context = ValidationContext.Instance;
             var result = new ValidationResult();
             foreach (var rule in _rules.OrderByDescending(r => r.Priority))
@@ -33,13 +38,16 @@ namespace Ruleflow.NET.Engine.Validation.Core.Validators
                 {
                     rule.Validate(input);
                     context.RuleResults[rule.Id] = new RuleExecutionResult { Success = true };
+                    _logger.LogDebug("Rule {RuleId} executed successfully", rule.Id);
                 }
                 catch (Exception ex)
                 {
                     context.RuleResults[rule.Id] = new RuleExecutionResult { Success = false };
                     result.AddError(ex.Message, rule.Severity);
+                    _logger.LogError(ex, "Rule {RuleId} failed: {Message}", rule.Id, ex.Message);
                 }
             }
+            _logger.LogInformation("Finished validation of {InputType}", typeof(T).Name);
             return result;
         }
 
