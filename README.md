@@ -8,19 +8,19 @@ Ruleflow.NET is a flexible rule and validation framework for .NET 8. It lets you
 
 ## ✨ Key Features
 
-- **Intuitive Fluent API** - Create complex validation rules with a natural, readable syntax
-- **Conditional Logic** - Build sophisticated rule flows with if/then/else and switch expressions
-- **Rule Dependencies** - Define rules that depend on the results of other rules
-- **Prioritized Execution** - Control the order of rule evaluation with priority settings
-- **Comprehensive Results** - Get detailed validation results with configurable severity levels
-- **Dependency Awareness** - Built-in dependency graph validation to prevent circular references
-- **Clean Separation** - Keep your business logic separate from your application code
-- **Intelligent Rule References** - Use lightweight references that resolve rules from a registry when needed
-- **Flexible Data Mapping** - Convert dictionaries to objects and back using the built-in DataAutoMapper
-- **Batch Validation** - Validate collections of inputs with `BatchValidator`
-- **Composite Validators** - Merge results from multiple validators using `CompositeValidator`
-- **Shared Validation Context** - Pass data and rule results between rules via `ValidationContext`
-- **Event and Action Hooks** - Trigger custom actions or events from validation rules
+- 🚀 **Intuitive Fluent API** - Create complex validation rules with a natural, readable syntax
+- 🧠 **Conditional Logic** - Build sophisticated rule flows with if/then/else and switch expressions
+- 🔗 **Rule Dependencies** - Define rules that depend on the results of other rules
+- ⏱️ **Prioritized Execution** - Control the order of rule evaluation with priority settings
+- 📝 **Comprehensive Results** - Get detailed validation results with configurable severity levels
+- 🛡️ **Dependency Awareness** - Built-in dependency graph validation to prevent circular references
+- 🧹 **Clean Separation** - Keep your business logic separate from your application code
+- 📌 **Intelligent Rule References** - Use lightweight references that resolve rules from a registry when needed
+- 🔧 **Flexible Data Mapping** - Convert dictionaries to objects and back using the built-in DataAutoMapper
+- 🗂️ **Batch Validation** - Validate collections of inputs with `BatchValidator`
+- 🧱 **Composite Validators** - Merge results from multiple validators using `CompositeValidator`
+- 🤝 **Shared Validation Context** - Pass data and rule results between rules via `ValidationContext`
+- 🎯 **Event and Action Hooks** - Trigger custom actions or events from validation rules
 
 ## 🏗️ Architecture
 
