@@ -99,9 +99,7 @@ Additional examples can be found in the unit tests inside `Ruleflow.NET.Tests`.
 
 ## Roadmap
 
-- Zjednodušení použití
-- Lepší konfigurace
-- Integrované logování a auditování
+- better & simplistic configuration in project
 
 ## Building and tests
 
