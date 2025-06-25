@@ -15,16 +15,16 @@ namespace Ruleflow.NET.Tests
         public void SwitchRule_UsesMatchingCase()
         {
             var ruleType = RuleBuilderFactory.CreateRuleType<Item>("SWITCH", "Switch");
-            var caseRule = RuleBuilderFactory.CreateSingleResponsibilityRuleBuilder<Item>(ruleType)
+            var caseRule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithValidation((i, ctx) => true)
                 .WithErrorMessage("case")
                 .Build();
-            var defaultRule = RuleBuilderFactory.CreateSingleResponsibilityRuleBuilder<Item>(ruleType)
+            var defaultRule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithValidation((i, ctx) => false)
                 .WithErrorMessage("default")
                 .Build();
 
-            var switchRule = RuleBuilderFactory.CreateSwitchRuleBuilder<Item>(ruleType)
+            var switchRule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithSwitchKeyFunction((i, ctx) => i.Category)
                 .AddCase("A", caseRule)
                 .WithDefaultCase(defaultRule)
@@ -39,16 +39,16 @@ namespace Ruleflow.NET.Tests
         public void SwitchRule_UsesDefaultCaseWhenNoMatch()
         {
             var ruleType = RuleBuilderFactory.CreateRuleType<Item>("SWITCH", "Switch");
-            var caseRule = RuleBuilderFactory.CreateSingleResponsibilityRuleBuilder<Item>(ruleType)
+            var caseRule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithValidation((i, ctx) => true)
                 .WithErrorMessage("case")
                 .Build();
-            var defaultRule = RuleBuilderFactory.CreateSingleResponsibilityRuleBuilder<Item>(ruleType)
+            var defaultRule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithValidation((i, ctx) => false)
                 .WithErrorMessage("default")
                 .Build();
 
-            var switchRule = RuleBuilderFactory.CreateSwitchRuleBuilder<Item>(ruleType)
+            var switchRule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithSwitchKeyFunction((i, ctx) => i.Category)
                 .AddCase("A", caseRule)
                 .WithDefaultCase(defaultRule)
@@ -63,12 +63,12 @@ namespace Ruleflow.NET.Tests
         public void TypedSwitchRule_WorksCorrectly()
         {
             var ruleType = RuleBuilderFactory.CreateRuleType<Item>("TSWITCH", "TypedSwitch");
-            var caseRule = RuleBuilderFactory.CreateSingleResponsibilityRuleBuilder<Item>(ruleType)
+            var caseRule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithValidation((i, ctx) => true)
                 .WithErrorMessage("case")
                 .Build();
 
-            var switchRule = RuleBuilderFactory.CreateSwitchRuleBuilder<Item, int>(ruleType)
+            var switchRule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithSwitchKeyFunction((i, ctx) => i.Category.Length)
                 .AddCase(1, caseRule)
                 .Build();

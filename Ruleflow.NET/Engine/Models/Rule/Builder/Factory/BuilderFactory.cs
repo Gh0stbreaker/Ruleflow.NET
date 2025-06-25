@@ -19,6 +19,15 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         private static int GetNextRuleId() => _nextRuleId++;
 
         /// <summary>
+        /// Creates a unified rule builder that exposes all configuration options.
+        /// </summary>
+        public static UnifiedRuleBuilder<TInput> CreateUnifiedRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
+        {
+            ruleType ??= CreateRuleType<TInput>("UNIFIED", "Unified Rule", "Universal rule builder");
+            return new UnifiedRuleBuilder<TInput>(GetNextRuleId(), ruleType);
+        }
+
+        /// <summary>
         /// Vytvoří jednoduchý RuleType pro použití v builderech.
         /// </summary>
         /// <param name="code">Kód typu pravidla.</param>

@@ -16,7 +16,7 @@ namespace Ruleflow.NET.Tests
         public void RegisterRule_AddsRuleToRegistry()
         {
             var registry = new RuleRegistry<Dummy>();
-            var rule = RuleBuilderFactory.CreateSingleResponsibilityRuleBuilder<Dummy>()
+            var rule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Dummy>()
                 .WithValidation((d, ctx) => d.Value > 0)
                 .WithErrorMessage("Invalid")
                 .Build();
@@ -31,7 +31,7 @@ namespace Ruleflow.NET.Tests
         public void UnregisterRule_RemovesRuleFromRegistry()
         {
             var registry = new RuleRegistry<Dummy>();
-            var rule = RuleBuilderFactory.CreateSingleResponsibilityRuleBuilder<Dummy>()
+            var rule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Dummy>()
                 .WithValidation((d, ctx) => d.Value > 0)
                 .WithErrorMessage("Invalid")
                 .Build();

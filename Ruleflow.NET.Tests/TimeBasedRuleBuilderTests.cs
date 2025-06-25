@@ -17,7 +17,7 @@ namespace Ruleflow.NET.Tests
         {
             DateTimeOffset captured = DateTimeOffset.MinValue;
             var ruleType = RuleBuilderFactory.CreateRuleType<Item>("TIME", "Time");
-            var rule = RuleBuilderFactory.CreateTimeBasedRuleBuilder<Item>(ruleType)
+            var rule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithTimeCondition((i, t, ctx) => { captured = t; return true; })
                 .UseCurrentTime(true)
                 .Build();
@@ -31,7 +31,7 @@ namespace Ruleflow.NET.Tests
         public void TimeBasedRule_RequiresEvaluationTime_WhenNotUsingCurrentTime()
         {
             var ruleType = RuleBuilderFactory.CreateRuleType<Item>("TIME", "Time");
-            var rule = RuleBuilderFactory.CreateTimeBasedRuleBuilder<Item>(ruleType)
+            var rule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithTimeCondition((i, t, ctx) => true)
                 .UseCurrentTime(false)
                 .Build();
@@ -46,7 +46,7 @@ namespace Ruleflow.NET.Tests
             DateTimeOffset expected = new DateTimeOffset(2024,1,1,0,0,0,TimeSpan.Zero);
             DateTimeOffset captured = DateTimeOffset.MinValue;
             var ruleType = RuleBuilderFactory.CreateRuleType<Item>("TIME", "Time");
-            var rule = RuleBuilderFactory.CreateTimeBasedRuleBuilder<Item>(ruleType)
+            var rule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Item>(ruleType)
                 .WithTimeCondition((i, t, ctx) => { captured = t; return true; })
                 .UseCurrentTime(false)
                 .Build();

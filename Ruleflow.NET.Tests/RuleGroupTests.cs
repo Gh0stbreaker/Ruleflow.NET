@@ -15,7 +15,7 @@ namespace Ruleflow.NET.Tests
         {
             var groupType = new RuleGroupType<Dummy>(1, "CODE", "Group");
             var ruleType = RuleBuilderFactory.CreateRuleType<Dummy>("S", "Single");
-            var rule = RuleBuilderFactory.CreateSingleResponsibilityRuleBuilder<Dummy>(ruleType)
+            var rule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Dummy>(ruleType)
                 .WithValidation((d, c) => true)
                 .WithErrorMessage("err")
                 .Build() as Rule<Dummy>;

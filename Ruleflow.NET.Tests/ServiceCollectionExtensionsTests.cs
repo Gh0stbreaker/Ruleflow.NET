@@ -35,7 +35,7 @@ namespace Ruleflow.NET.Tests
         public void AddRuleflow_WithInitialRules_RegistersThem()
         {
             var rule = Ruleflow.NET.Engine.Models.Rule.Builder.RuleBuilderFactory
-                .CreateSingleResponsibilityRuleBuilder<Person>()
+                .CreateUnifiedRuleBuilder<Person>()
                 .WithValidation((p, ctx) => p.Age >= 18)
                 .WithErrorMessage("Age must be at least 18")
                 .Build();
