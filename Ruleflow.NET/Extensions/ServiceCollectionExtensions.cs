@@ -45,7 +45,7 @@ namespace Ruleflow.NET.Extensions
 
             services.AddSingleton<IRuleRegistry<TInput>>(sp =>
             {
-                var loggerFactory = sp.GetService<ILoggerFactory>() ?? NullLoggerFactory.Instance;
+                var loggerFactory = options.LoggerFactory ?? sp.GetService<ILoggerFactory>() ?? NullLoggerFactory.Instance;
                 var logger = loggerFactory.CreateLogger<RuleRegistry<TInput>>();
                 var reg = new RuleRegistry<TInput>(options.InitialRules ?? Array.Empty<IRule<TInput>>(), logger);
 
@@ -109,7 +109,7 @@ namespace Ruleflow.NET.Extensions
                     }
                     foreach (var profile in profiles)
                         validationRules.AddRange(profile.ValidationRules);
-                    var loggerFactory = sp.GetService<ILoggerFactory>() ?? NullLoggerFactory.Instance;
+                    var loggerFactory = options.LoggerFactory ?? sp.GetService<ILoggerFactory>() ?? NullLoggerFactory.Instance;
                     var logger = loggerFactory.CreateLogger<Validator<TInput>>();
                     return new Validator<TInput>(validationRules, logger);
                 });
