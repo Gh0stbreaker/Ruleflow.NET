@@ -21,8 +21,8 @@ namespace Ruleflow.NET.Engine.Data.Mapping
         /// </summary>
         public static DataAutoMapper<T> FromAttributes()
         {
-            var rules = Engine.Extensions.AttributeRuleLoader.LoadMappingRules<T>();
-            return new DataAutoMapper<T>(rules);
+            var profile = Engine.Extensions.AttributeRuleLoader.LoadProfile<T>();
+            return new DataAutoMapper<T>(profile.MappingRules);
         }
 
         /// <summary>

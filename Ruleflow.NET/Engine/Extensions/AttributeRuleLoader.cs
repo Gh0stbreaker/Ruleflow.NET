@@ -9,6 +9,7 @@ using Ruleflow.NET.Engine.Validation;
 using Ruleflow.NET.Engine.Validation.Core.Base;
 using Ruleflow.NET.Engine.Validation.Enums;
 using Ruleflow.NET.Engine.Validation.Interfaces;
+using Ruleflow.NET.Extensions;
 
 namespace Ruleflow.NET.Engine.Extensions
 {
@@ -68,6 +69,16 @@ namespace Ruleflow.NET.Engine.Extensions
                 }
             }
             return rules;
+        }
+
+        /// <summary>
+        /// Loads both mapping and validation rules discovered on <typeparamref name="T"/>.
+        /// </summary>
+        public static RuleflowProfile<T> LoadProfile<T>()
+        {
+            var mappings = LoadMappingRules<T>();
+            var validations = LoadValidationRules<T>();
+            return new RuleflowProfile<T>(mappings, validations);
         }
     }
 }

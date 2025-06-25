@@ -27,7 +27,9 @@ namespace Ruleflow.NET.Extensions
         /// <param name="services">The service collection to add to.</param>
         /// <param name="configure">Optional configuration for initial rules.</param>
         /// <returns>The modified service collection.</returns>
-        public static IServiceCollection AddRuleflow<TInput>(this IServiceCollection services, Action<RuleflowOptions<TInput>>? configure = null)
+        public static IServiceCollection AddRuleflow<TInput>(this IServiceCollection services,
+            Action<RuleflowOptions<TInput>>? configure = null,
+            params RuleflowProfile<TInput>[] profiles)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
@@ -47,10 +49,17 @@ namespace Ruleflow.NET.Extensions
 
             services.AddSingleton<IRuleRegistry<TInput>>(registry);
 
-            // Register automapper built from attributes if requested
+            var mappingRules = new List<DataMappingRule<TInput>>();
             if (options.AutoRegisterMappings)
+                mappingRules.AddRange(AttributeRuleLoader.LoadMappingRules<TInput>());
+            foreach (var profile in profiles)
             {
-                services.AddSingleton<IDataAutoMapper<TInput>>(_ => DataAutoMapper<TInput>.FromAttributes());
+                services.AddSingleton(profile);
+                mappingRules.AddRange(profile.MappingRules);
+            }
+            if (mappingRules.Count > 0)
+            {
+                services.AddSingleton<IDataAutoMapper<TInput>>(_ => new DataAutoMapper<TInput>(mappingRules));
             }
 
             // Register ValidationContext singleton so it can be injected where needed
@@ -61,13 +70,15 @@ namespace Ruleflow.NET.Extensions
             {
                 services.AddSingleton<IValidator<TInput>>(sp =>
                 {
-                    var registry = sp.GetRequiredService<IRuleRegistry<TInput>>();
+                    var reg = sp.GetRequiredService<IRuleRegistry<TInput>>();
                     var validationRules = new List<IValidationRule<TInput>>();
-                    foreach (var rule in registry.AllRules)
+                    foreach (var rule in reg.AllRules)
                     {
                         if (rule is IValidationRule<TInput> vr)
                             validationRules.Add(vr);
                     }
+                    foreach (var profile in profiles)
+                        validationRules.AddRange(profile.ValidationRules);
                     return new Validator<TInput>(validationRules);
                 });
             }

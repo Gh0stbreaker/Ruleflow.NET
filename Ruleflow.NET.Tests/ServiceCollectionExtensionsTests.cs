@@ -6,6 +6,8 @@ using Ruleflow.NET.Engine.Validation.Enums;
 using Ruleflow.NET.Extensions;
 using Ruleflow.NET.Engine.Registry.Interface;
 using Ruleflow.NET.Engine.Validation.Interfaces;
+using Ruleflow.NET.Engine.Data.Enums;
+using Ruleflow.NET.Engine.Data.Mapping;
 
 namespace Ruleflow.NET.Tests
 {
@@ -83,6 +85,23 @@ namespace Ruleflow.NET.Tests
 
             var validator = provider.GetService<IValidator<Person>>();
             Assert.IsNull(validator);
+        }
+
+        [TestMethod]
+        public void AddRuleflow_WithProfile_RegistersMapperAndValidator()
+        {
+            var profile = new RuleflowProfile<Person>();
+            profile.MappingRules.Add(new DataMappingRule<Person>(p => p.Age, "age", DataType.Int32));
+            profile.ValidationRules.Add(RuleflowExtensions.CreateRule<Person>()
+                .WithAction(p => { if (p.Age < 0) throw new ArgumentException(); })
+                .Build());
+
+            var services = new ServiceCollection();
+            services.AddRuleflow<Person>(o => o.RegisterDefaultValidator = true, profile);
+            var provider = services.BuildServiceProvider();
+
+            Assert.IsNotNull(provider.GetRequiredService<IDataAutoMapper<Person>>());
+            Assert.IsNotNull(provider.GetRequiredService<IValidator<Person>>());
         }
     }
 }
