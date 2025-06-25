@@ -140,6 +140,7 @@ using Microsoft.Extensions.DependencyInjection;
 var profile = AttributeRuleLoader.LoadProfile<Person>();
 
 var services = new ServiceCollection();
+services.AddLogging(b => b.AddConsole());
 services.AddRuleflow<Person>(options => options.InitialRules = new[] { ageRule }, profile);
 var provider = services.BuildServiceProvider();
 ```
@@ -150,6 +151,21 @@ var provider = services.BuildServiceProvider();
 2. Define your validation rules using the fluent builders or attributes
 3. Register Ruleflow in your dependency injection container
 4. Create a validator and call `CollectValidationResults`
+
+## 📝 Logging
+
+Ruleflow uses **Microsoft.Extensions.Logging** for all internal messages. If no logger is configured, the
+library falls back to `NullLogger` so your application runs silently. To see logs in a console
+application, call `AddLogging()` when configuring your service collection:
+
+```csharp
+var services = new ServiceCollection();
+services.AddLogging(b => b.AddConsole());
+services.AddRuleflow<Person>();
+```
+
+In GUI apps such as WPF you can plug in any logging framework (e.g., NLog, Serilog) and forward messages
+to a text box or other UI element.
 
 Additional examples can be found in the unit tests inside `Ruleflow.NET.Tests`.
 
