@@ -159,6 +159,9 @@ var provider = services.BuildServiceProvider();
 3. Register Ruleflow in your dependency injection container
 4. Create a validator and call `CollectValidationResults`
 
+For a more detailed protocol of the recommended configuration process read the
+[`Ruleflow Codex`](docs/RuleflowCodex.md) document.
+
 ## 📝 Logging
 
 Ruleflow uses **Microsoft.Extensions.Logging** for all internal messages. If no logger is configured, the
