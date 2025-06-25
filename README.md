@@ -1,16 +1,12 @@
 <div align="center">
-  <img src="Ruleflow.NET/Engine/Images/Ruleflow.NET.png" alt="Ruleflow.NET Logo">
+  <img src="Ruleflow.NET/Engine/Images/Ruleflow.NET.png" alt="Ruleflow.NET logo" />
 </div>
 
 # Ruleflow.NET
 
-### 🌟 Overview
+Ruleflow.NET is a flexible rule and validation framework for .NET 8. It lets you compose complex business logic with a fluent API while keeping application code clean. The engine supports dependency-aware execution, data mapping utilities and a lightweight event system.
 
-Ruleflow.NET is a flexible, high-performance business rules and validation framework for .NET applications. Built with modern C# features and a fluent API design, Ruleflow.NET helps you create, manage, and execute complex business logic and validation rules with minimal code and maximum readability.
-
-> ⚠️ **Note:** Ruleflow.NET is currently under active development. While core functionality is stable, some features may change before the final release.
-
-### ✨ Key Features
+## ✨ Key Features
 
 - **Intuitive Fluent API** - Create complex validation rules with a natural, readable syntax
 - **Conditional Logic** - Build sophisticated rule flows with if/then/else and switch expressions
@@ -26,336 +22,99 @@ Ruleflow.NET is a flexible, high-performance business rules and validation frame
 - **Shared Validation Context** - Pass data and rule results between rules via `ValidationContext`
 - **Event and Action Hooks** - Trigger custom actions or events from validation rules
 
-### 🚀 Getting Started
+## 🏗️ Architecture
 
-#### Installation
+Ruleflow.NET is built around a set of core components:
 
-```bash
-# Coming soon to NuGet!
-dotnet add package Ruleflow.NET
-```
+- **`IValidationRule<T>`** - Base interface for validation rules
+- **`IValidator<T>`** - Interface for validators that execute rules
+- **`ValidationContext`** - Shares data and rule results during validation
+- **`DependencyAwareValidator<T>`** - Handles rule dependencies and priorities
+- **`DataAutoMapper<T>`** - Maps dictionaries to typed objects
+- **`RuleReference<T>`** - Lightweight references that resolve rules from a registry
 
-### 📖 Usage Examples
-
-#### Example 1: Simple Validation
-
-```csharp
-// Create a simple validation rule
-var ageRule = RuleflowExtensions.CreateRule<Person>()
-    .WithAction(p =>
-    {
-        if (p.Age < 18)
-            throw new ArgumentException("Person must be at least 18 years old");
-    })
-    .WithMessage("Age validation failed")
-    .WithSeverity(ValidationSeverity.Error)
-    .Build();
-
-// Create a validator with our rule
-var validator = new Validator<Person>(new[] { ageRule });
-
-// Validate a person
-var person = new Person { Name = "John", Age = 17 };
-var result = validator.CollectValidationResults(person);
-
-// Check the result
-if (!result.IsValid)
-{
-    foreach (var error in result.Errors)
-    {
-        Console.WriteLine($"{error.Severity}: {error.Message}");
-    }
-}
-```
-
-#### Using with Dependency Injection
-
-```csharp
-using Microsoft.Extensions.DependencyInjection;
-var profile = AttributeRuleLoader.LoadProfile<Person>();
-var services = new ServiceCollection();
-services.AddRuleflow<Person>(options =>
-{
-    options.InitialRules = new[] { ageRule };
-}, profile);
-var provider = services.BuildServiceProvider();
-```
-
-#### Example 2: Intermediate Rule Flow
-
-```csharp
-// Create a conditional validation rule
-var drivingRule = RuleflowExtensions
-    .CreateConditionalRule<Person>(p => p.HasDrivingLicense)
-    .Then(builder => builder
-        .WithAction(p => {
-            if (p.Age < 16)
-                throw new ArgumentException("Driving license holders must be at least 16");
-        })
-        .WithMessage("Invalid driving license")
-    )
-    .Else(builder => builder
-        .WithAction(p => {
-            if (p.Age < 13)
-                throw new ArgumentException("Non-drivers must be at least 13");
-        })
-        .WithMessage("Age validation failed")
-    )
-
-    .Build();
-```
-
-#### Example 3: Full Featured Scenario
-
-```csharp
-// Load rules and mappings defined via attributes
-var profile = AttributeRuleLoader.LoadProfile<Person>();
-var mapper = DataAutoMapper<Person>.FromAttributes();
-
-// Register rules in a registry and add an event trigger rule
-var registry = new RuleRegistry<Person>(profile.ValidationRules);
-var notifyRule = RuleflowExtensions.CreateEventRule<Person>("PersonValidated")
-    .WithPriority(100)
-    .Build();
-registry.RegisterRule(notifyRule);
-
-// Obtain a lightweight reference to the rule
-IRuleReference<Person> reference = notifyRule.Reference;
-
-// Create a composite validator using dependency awareness
-var dependencyValidator = new DependencyAwareValidator<Person>(registry.Rules);
-var simpleValidator = new Validator<Person>(profile.ValidationRules);
-var composite = new CompositeValidator<Person>(new[] { dependencyValidator, simpleValidator });
-
-// Map dictionary data to an object and validate
-var context = new DataContext();
-var data = new Dictionary<string, string>
-{
-    ["name"] = "Anna",
-    ["age"] = "28"
-};
-Person person = mapper.MapToObject(data, context);
-var result = composite.CollectValidationResults(person);
-
-// Batch validation of a collection
-var batch = new BatchValidator<Person>(registry.Rules);
-var batchResult = batch.CollectValidationResults(new[] { person });
-
-// React to the event triggered by the rule
-EventHub.Register("PersonValidated", () => Console.WriteLine("Event fired"));
-```
-
-### 🔧 Advanced Features
-
-#### Dependent Rules
-
-```csharp
-// Create rules with dependencies
-var primaryRule = RuleflowExtensions.CreateRule<Order>()
-    .WithId("PrimaryCheck")
-    .WithAction(o => {
-        if (o.Amount <= 0)
-            throw new ArgumentException("Order amount must be positive");
-    })
-    .Build();
-
-var dependentRule = RuleflowExtensions.CreateDependentRule<Order>("SecondaryCheck")
-    .DependsOn("PrimaryCheck")
-    .WithDependencyType(DependencyType.RequiresAllSuccess)
-    .WithAction(o => {
-        if (o.Items.Count == 0)
-            throw new ArgumentException("Order must have at least one item");
-    })
-    .Build();
-```
-
-#### Switch Pattern Rules
-
-```csharp
-// Create a switch-based rule
-var statusRule = RuleflowExtensions
-    .CreateSwitchRule<Order, OrderStatus>(o => o.Status)
-    .Case(OrderStatus.Draft, builder => builder
-        .WithAction(o => {
-            if (o.DraftDate == null)
-                throw new ArgumentException("Draft orders must have a draft date");
-        })
-    )
-    .Case(OrderStatus.Submitted, builder => builder
-        .WithAction(o => {
-            if (o.SubmissionDate == null)
-                throw new ArgumentException("Submitted orders must have a submission date");
-        })
-    )
-    .Default(builder => builder
-        .WithAction(o => {
-            if (o.LastModified == null)
-                throw new ArgumentException("All orders must have a last modified date");
-        })
-    )
-    .Build();
-```
-
-#### Data Mapping with DataAutoMapper
-
-```csharp
-// Define mapping rules
-var mapRules = new[]
-{
-    new DataMappingRule<Person>(p => p.Name, "name", DataType.String, true),
-    new DataMappingRule<Person>(p => p.Age, "age", DataType.Int32, true)
-};
-
-var mapper = new DataAutoMapper<Person>(mapRules);
-var context = new DataContext();
-
-var dictionary = new Dictionary<string, string>
-{
-    ["name"] = "John",
-    ["age"] = "30"
-};
-
-Person person = mapper.MapToObject(dictionary, context);
-```
-
-#### Attribute-Based Mapping and Rules
-
-```csharp
-public class Person
-{
-    [MapKey("name", DataType.String, Required = true)]
-    public string Name { get; set; } = string.Empty;
-
-    [MapKey("age", DataType.Int32, Required = true)]
-    public int Age { get; set; }
-}
-
-var profile = AttributeRuleLoader.LoadProfile<Person>();
-var mapper = new DataAutoMapper<Person>(profile.MappingRules);
-```
-
-Validation rules can also be declared on static methods:
-
-```csharp
-public static class PersonRules
-{
-    [ValidationRule("NameRequired")]
-    public static void NameRequired(Person p)
-    {
-        if (string.IsNullOrWhiteSpace(p.Name))
-            throw new ArgumentException("Name required");
-    }
-}
-
-var profile = AttributeRuleLoader.LoadProfile<Person>();
-var validator = new Validator<Person>(profile.ValidationRules);
-```
-
-#### Working with Rule References
-
-```csharp
-var ruleRegistry = new RuleRegistry<Person>();
-ruleRegistry.RegisterRule(ageRule);
-
-IRuleReference<Person> reference = ageRule.Reference;
-
-if (reference.TryResolve(ruleRegistry, out var resolved))
-{
-    // Use resolved rule
-}
-```
-
-#### Batch Validation
-
-```csharp
-var quantityRule = RuleflowExtensions.CreateRule<Item>()
-    .WithAction(i =>
-    {
-        if (i.Quantity <= 0)
-            throw new ArgumentException("Quantity must be positive");
-    })
-    .Build();
-
-var batchValidator = new BatchValidator<Item>(new[] { quantityRule });
-var result = batchValidator.CollectValidationResults(items);
-```
-
-#### Unified Rule Builder
-
-```csharp
-var rule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Person>()
-    .WithValidation((p, ctx) => p.Age >= 18)
-    .WithPriority(10)
-    .Build();
-```
-
-#### Combining Validators
-
-```csharp
-var nameValidator = new Validator<Customer>(new[] { nameRule });
-var emailValidator = new Validator<Customer>(new[] { emailRule });
-
-var composite = new CompositeValidator<Customer>(new[] { nameValidator, emailValidator });
-var validation = composite.CollectValidationResults(customer);
-```
-
-### 🏗️ Architecture
-
-Ruleflow.NET is designed around a set of core interfaces and components:
-
-- **`IValidationRule<T>`** - Base interface for all validation rules
-- **`IValidator<T>`** - Interface for validators that can validate objects of type T
-- **`IValidationResult`** - Contains the results of a validation operation
-- **`ValidationRuleBuilder<T>`** - Fluent API for constructing validation rules
-- **`DependencyAwareValidator<T>`** - Validator that supports rule dependencies
-- **`ValidationContext`** - Context for validation operations, including results of rule evaluations
-- **`BatchValidator<T>`** - Processes lists of inputs and aggregates all errors
-- **`CompositeValidator<T>`** - Combines multiple validators into one
-- **`DataAutoMapper<T>`** - Maps dictionary data to objects using typed values
-- **`RuleReference<T>`** - Lightweight reference that resolves rules from a registry
-
-### 🌐 Use Cases
+## 🌐 Use Cases
 
 - **Form Validation** - Validate user input with complex business rules
 - **API Request Validation** - Ensure incoming requests meet your requirements
 - **Business Rule Processing** - Execute business logic in a structured, maintainable way
 - **Workflow Validation** - Verify that each step in a workflow can proceed
-- **Data Integrity Checks** - Ensure your data meets your business constraints
+- **Data Integrity Checks** - Keep your data consistent with your domain rules
 
-### 📋 Roadmap
-- **Short-term goals (next release)**
-  1. Asynchronous rule evaluation (`IAsyncValidationRule`, `AsyncValidator`)
-  2. Integrated logging using `Microsoft.Extensions.Logging`
-  3. Configurable rule loading from JSON/YAML files
+## Why Ruleflow.NET?
 
-- **Mid-term goals**
-  1. Persistent storage for the rule registry (e.g., SQLite/SQL Server/NoSQL)
-  2. Command-line interface for rule management
-  3. Extended asynchronous `EventHub` with integration to messaging systems
+- Clear separation of rules from application code
+- Reusable rules and validators with minimal boilerplate
+- Works with dependency injection for easy integration
+- Supports attribute-based configuration and fluent builders
 
-- **Long-term goals**
-  1. Web interface for management and monitoring (e.g., Blazor)
-  2. Rule versioning with audit log of changes
-  3. Machine learning integration (connect to external ML models)
+## Getting started
 
-### 📚 Documentation
+### Installation
 
-Comprehensive documentation is in progress and will be available soon.
+```bash
+# Package will be available on NuGet
+dotnet add package Ruleflow.NET
+```
 
-### 📝 Code Comments
+### Basic usage
 
-The source code now contains detailed XML comments in both Czech and English. These comments explain the purpose of each class and method to help new contributors understand how the framework works.
+```csharp
+var ageRule = RuleflowExtensions.CreateRule<Person>()
+    .WithAction(p =>
+    {
+        if (p.Age < 18)
+            throw new ArgumentException("Person must be an adult");
+    })
+    .WithMessage("Age validation failed")
+    .Build();
 
-### 🤝 Contributing
+var validator = new Validator<Person>(new[] { ageRule });
+var result = validator.CollectValidationResults(new Person { Name = "John", Age = 17 });
 
-Contributions are welcome! Feel free to submit issues or pull requests to help improve Ruleflow.NET.
+foreach (var error in result.Errors)
+    Console.WriteLine($"{error.Severity}: {error.Message}");
+```
 
-### 📄 License
+### Dependency injection
 
-Ruleflow.NET is licensed under the [Apache License 2.0](LICENSE.txt).
+```csharp
+using Microsoft.Extensions.DependencyInjection;
 
----
+var profile = AttributeRuleLoader.LoadProfile<Person>();
 
-Made with ❤️
+var services = new ServiceCollection();
+services.AddRuleflow<Person>(options => options.InitialRules = new[] { ageRule }, profile);
+var provider = services.BuildServiceProvider();
+```
 
+### Implementing in your project
 
+1. Install the NuGet package
+2. Define your validation rules using the fluent builders or attributes
+3. Register Ruleflow in your dependency injection container
+4. Create a validator and call `CollectValidationResults`
+
+Additional examples can be found in the unit tests inside `Ruleflow.NET.Tests`.
+
+## Roadmap
+
+- Zjednodušení použití
+- Lepší konfigurace
+- Integrované logování a auditování
+
+## Building and tests
+
+Run the tests using the .NET SDK:
+
+```bash
+dotnet test
+```
+
+## Contributing
+
+Contributions and feedback are welcome. Feel free to open issues or submit pull requests.
+
+## License
+
+This project is licensed under the [Apache License 2.0](LICENSE.txt).
