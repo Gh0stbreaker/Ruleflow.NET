@@ -2,7 +2,7 @@
   <img src="Ruleflow.NET/Engine/Images/Ruleflow.NET.png" alt="Ruleflow.NET logo" />
 </div>
 
-# Ruleflow.NET
+# ⚙️ Ruleflow.NET
 
 Ruleflow.NET is a flexible rule and validation framework for .NET 8. It lets you compose complex business logic with a fluent API while keeping application code clean. The engine supports dependency-aware execution, data mapping utilities and a lightweight event system.
 
@@ -41,23 +41,23 @@ Ruleflow.NET is built around a set of core components:
 - **Workflow Validation** - Verify that each step in a workflow can proceed
 - **Data Integrity Checks** - Keep your data consistent with your domain rules
 
-## Why Ruleflow.NET?
+## ❓ Why Ruleflow.NET?
 
 - Clear separation of rules from application code
 - Reusable rules and validators with minimal boilerplate
 - Works with dependency injection for easy integration
 - Supports attribute-based configuration and fluent builders
 
-## Getting started
+## 🚀 Getting started
 
-### Installation
+### 📦 Installation
 
 ```bash
 # Package will be available on NuGet
 dotnet add package Ruleflow.NET
 ```
 
-### Basic usage
+### 🔰 Basic usage
 
 ```csharp
 var ageRule = RuleflowExtensions.CreateRule<Person>()
@@ -76,7 +76,7 @@ foreach (var error in result.Errors)
     Console.WriteLine($"{error.Severity}: {error.Message}");
 ```
 
-### Real-world example
+### 🌍 Real-world example
 
 ```csharp
 public class SignUpModel
@@ -132,7 +132,7 @@ foreach (var error in result2.Errors)
     Console.WriteLine(error.Message);
 ```
 
-### Dependency injection
+### 🔌 Dependency injection
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
@@ -144,7 +144,7 @@ services.AddRuleflow<Person>(options => options.InitialRules = new[] { ageRule }
 var provider = services.BuildServiceProvider();
 ```
 
-### Implementing in your project
+### 🛠️ Implementing in your project
 
 1. Install the NuGet package
 2. Define your validation rules using the fluent builders or attributes
@@ -153,11 +153,11 @@ var provider = services.BuildServiceProvider();
 
 Additional examples can be found in the unit tests inside `Ruleflow.NET.Tests`.
 
-## Roadmap
+## 🗺️ Roadmap
 
 - better & simplistic configuration in project
 
-## Building and tests
+## 🧪 Building and tests
 
 Run the tests using the .NET SDK:
 
@@ -165,10 +165,10 @@ Run the tests using the .NET SDK:
 dotnet test
 ```
 
-## Contributing
+## 🤝 Contributing
 
 Contributions and feedback are welcome. Feel free to open issues or submit pull requests.
 
-## License
+## 📄 License
 
 This project is licensed under the [Apache License 2.0](LICENSE.txt).
