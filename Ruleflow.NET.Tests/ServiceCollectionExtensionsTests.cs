@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ruleflow.NET.Engine.Validation;
 using Ruleflow.NET.Engine.Validation.Enums;
+using Ruleflow.NET.Engine.Data.Enums;
+using Ruleflow.NET.Engine.Data.Mapping;
 using Ruleflow.NET.Extensions;
 using Ruleflow.NET.Engine.Registry.Interface;
 using Ruleflow.NET.Engine.Validation.Interfaces;
@@ -15,6 +17,25 @@ namespace Ruleflow.NET.Tests
         private class Person
         {
             public int Age { get; set; }
+        }
+
+        internal class MappedPerson
+        {
+            [MapKey("name", DataType.String, Required = true)]
+            public string Name { get; set; } = string.Empty;
+
+            [MapKey("age", DataType.Int32, Required = true)]
+            public int Age { get; set; }
+        }
+
+        private static class MappedPersonRules
+        {
+            [ValidationRule("NameRequired", Severity = ValidationSeverity.Error)]
+            public static void NameRequired(MappedPerson p)
+            {
+                if (string.IsNullOrWhiteSpace(p.Name))
+                    throw new ArgumentException("Name required");
+            }
         }
 
         [TestMethod]
@@ -83,6 +104,54 @@ namespace Ruleflow.NET.Tests
 
             var validator = provider.GetService<IValidator<Person>>();
             Assert.IsNull(validator);
+        }
+
+        [TestMethod]
+        public void AddRuleflow_AutoRegisterAttributeRules_LoadsRulesAndMapper()
+        {
+            var services = new ServiceCollection();
+            services.AddRuleflow<MappedPerson>(o =>
+            {
+                o.AutoRegisterAttributeRules = true;
+                o.AssembliesToScan = new[] { typeof(ServiceCollectionExtensionsTests).Assembly };
+            });
+
+            var provider = services.BuildServiceProvider();
+
+            var registry = provider.GetRequiredService<IRuleRegistry<MappedPerson>>();
+            Assert.IsNotNull(registry.GetRuleById("NameRequired"));
+
+            var mapper = provider.GetRequiredService<IDataAutoMapper<MappedPerson>>();
+            var person = mapper.MapToObject(new Dictionary<string, string> { { "name", "John" }, { "age", "50" } }, new DataContext());
+            Assert.AreEqual("John", person.Name);
+            Assert.AreEqual(50, person.Age);
+        }
+
+        [TestMethod]
+        public void AddRuleflow_NamespaceFilter_Works()
+        {
+            var services = new ServiceCollection();
+            services.AddRuleflow<MappedPerson>(o =>
+            {
+                o.AutoRegisterAttributeRules = true;
+                o.AssembliesToScan = new[] { typeof(ServiceCollectionExtensionsTests).Assembly };
+                o.NamespaceFilters = new[] { typeof(MappedPersonRules).Namespace! };
+            });
+
+            var provider = services.BuildServiceProvider();
+
+            var registry = provider.GetRequiredService<IRuleRegistry<MappedPerson>>();
+            Assert.IsNotNull(registry.GetRuleById("NameRequired"));
+            Assert.IsNull(registry.GetRuleById("OtherRule"));
+        }
+    }
+
+    namespace External
+    {
+        internal static class OtherRules
+        {
+            [ValidationRule("OtherRule")]
+            public static void Other(ServiceCollectionExtensionsTests.MappedPerson p) { }
         }
     }
 }

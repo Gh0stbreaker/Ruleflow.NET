@@ -44,30 +44,55 @@ namespace Ruleflow.NET.Engine.Extensions
         /// parameter of type <typeparamref name="T"/>.
         /// </summary>
         public static IEnumerable<IValidationRule<T>> LoadValidationRules<T>()
+            => LoadValidationRules<T>(new[] { typeof(T).Assembly }, null);
+
+        /// <summary>
+        /// Scans provided assemblies for static methods decorated with
+        /// <see cref="ValidationRuleAttribute"/> that accept a single parameter
+        /// of type <typeparamref name="T"/>.
+        /// </summary>
+        public static IEnumerable<IValidationRule<T>> LoadValidationRules<T>(IEnumerable<Assembly> assemblies, IEnumerable<string>? namespaceFilters)
         {
             var rules = new List<IValidationRule<T>>();
-            var assembly = typeof(T).Assembly;
-            foreach (var type in assembly.GetTypes())
+            var ns = namespaceFilters?.ToArray();
+
+            foreach (var assembly in assemblies)
             {
-                foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                foreach (var type in assembly.GetTypes())
                 {
-                    var attr = method.GetCustomAttribute<ValidationRuleAttribute>();
-                    if (attr == null) continue;
-                    var parameters = method.GetParameters();
-                    if (parameters.Length != 1 || parameters[0].ParameterType != typeof(T))
+                    if (ns != null && type.Namespace != null && !ns.Any(n => type.Namespace.Equals(n, StringComparison.Ordinal)))
                         continue;
 
-                    if (!typeof(void).Equals(method.ReturnType))
-                        continue;
+                    foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                    {
+                        var attr = method.GetCustomAttribute<ValidationRuleAttribute>();
+                        if (attr == null) continue;
+                        var parameters = method.GetParameters();
+                        if (parameters.Length != 1 || parameters[0].ParameterType != typeof(T))
+                            continue;
 
-                    var action = (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), method);
-                    var rule = new ActionValidationRule<T>(attr.Id, action);
-                    rule.SetPriority(attr.Priority);
-                    rule.SetSeverity(attr.Severity);
-                    rules.Add(rule);
+                        if (!typeof(void).Equals(method.ReturnType))
+                            continue;
+
+                        var action = (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), method);
+                        var rule = new ActionValidationRule<T>(attr.Id, action);
+                        rule.SetPriority(attr.Priority);
+                        rule.SetSeverity(attr.Severity);
+                        rules.Add(rule);
+                    }
                 }
             }
+
             return rules;
+        }
+
+        /// <summary>
+        /// Determines whether type <typeparamref name="T"/> defines any
+        /// properties decorated with <see cref="MapKeyAttribute"/>.
+        /// </summary>
+        public static bool HasMapKeyAttributes<T>()
+        {
+            return typeof(T).GetProperties().Any(p => p.GetCustomAttribute<MapKeyAttribute>() != null);
         }
     }
 }
