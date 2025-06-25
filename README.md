@@ -69,11 +69,12 @@ if (!result.IsValid)
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
+var profile = AttributeRuleLoader.LoadProfile<Person>();
 var services = new ServiceCollection();
 services.AddRuleflow<Person>(options =>
 {
     options.InitialRules = new[] { ageRule };
-});
+}, profile);
 var provider = services.BuildServiceProvider();
 ```
 
@@ -185,7 +186,8 @@ public class Person
     public int Age { get; set; }
 }
 
-var mapper = DataAutoMapper<Person>.FromAttributes();
+var profile = AttributeRuleLoader.LoadProfile<Person>();
+var mapper = new DataAutoMapper<Person>(profile.MappingRules);
 ```
 
 Validation rules can also be declared on static methods:
@@ -201,7 +203,8 @@ public static class PersonRules
     }
 }
 
-var rules = AttributeRuleLoader.LoadValidationRules<Person>();
+var profile = AttributeRuleLoader.LoadProfile<Person>();
+var validator = new Validator<Person>(profile.ValidationRules);
 ```
 
 #### Working with Rule References
