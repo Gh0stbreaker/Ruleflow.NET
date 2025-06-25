@@ -35,12 +35,15 @@ Ruleflow.NET is a flexible, high-performance business rules and validation frame
 dotnet add package Ruleflow.NET
 ```
 
-#### Basic Usage
+### 📖 Usage Examples
+
+#### Example 1: Simple Validation
 
 ```csharp
 // Create a simple validation rule
 var ageRule = RuleflowExtensions.CreateRule<Person>()
-    .WithAction(p => {
+    .WithAction(p =>
+    {
         if (p.Age < 18)
             throw new ArgumentException("Person must be at least 18 years old");
     })
@@ -78,7 +81,7 @@ services.AddRuleflow<Person>(options =>
 var provider = services.BuildServiceProvider();
 ```
 
-#### Advanced Validation with Conditional Logic
+#### Example 2: Intermediate Rule Flow
 
 ```csharp
 // Create a conditional validation rule
@@ -98,7 +101,48 @@ var drivingRule = RuleflowExtensions
         })
         .WithMessage("Age validation failed")
     )
+
     .Build();
+```
+
+#### Example 3: Full Featured Scenario
+
+```csharp
+// Load rules and mappings defined via attributes
+var profile = AttributeRuleLoader.LoadProfile<Person>();
+var mapper = DataAutoMapper<Person>.FromAttributes();
+
+// Register rules in a registry and add an event trigger rule
+var registry = new RuleRegistry<Person>(profile.ValidationRules);
+var notifyRule = RuleflowExtensions.CreateEventRule<Person>("PersonValidated")
+    .WithPriority(100)
+    .Build();
+registry.RegisterRule(notifyRule);
+
+// Obtain a lightweight reference to the rule
+IRuleReference<Person> reference = notifyRule.Reference;
+
+// Create a composite validator using dependency awareness
+var dependencyValidator = new DependencyAwareValidator<Person>(registry.Rules);
+var simpleValidator = new Validator<Person>(profile.ValidationRules);
+var composite = new CompositeValidator<Person>(new[] { dependencyValidator, simpleValidator });
+
+// Map dictionary data to an object and validate
+var context = new DataContext();
+var data = new Dictionary<string, string>
+{
+    ["name"] = "Anna",
+    ["age"] = "28"
+};
+Person person = mapper.MapToObject(data, context);
+var result = composite.CollectValidationResults(person);
+
+// Batch validation of a collection
+var batch = new BatchValidator<Person>(registry.Rules);
+var batchResult = batch.CollectValidationResults(new[] { person });
+
+// React to the event triggered by the rule
+EventHub.Register("PersonValidated", () => Console.WriteLine("Event fired"));
 ```
 
 ### 🔧 Advanced Features
