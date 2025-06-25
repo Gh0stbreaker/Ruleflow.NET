@@ -1,6 +1,8 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Ruleflow.NET.Engine.Validation;
 using Ruleflow.NET.Engine.Validation.Enums;
 using Ruleflow.NET.Extensions;
@@ -8,6 +10,7 @@ using Ruleflow.NET.Engine.Registry.Interface;
 using Ruleflow.NET.Engine.Validation.Interfaces;
 using Ruleflow.NET.Engine.Data.Enums;
 using Ruleflow.NET.Engine.Data.Mapping;
+using Ruleflow.NET.Engine.Events;
 
 namespace Ruleflow.NET.Tests
 {
@@ -102,6 +105,21 @@ namespace Ruleflow.NET.Tests
 
             Assert.IsNotNull(provider.GetRequiredService<IDataAutoMapper<Person>>());
             Assert.IsNotNull(provider.GetRequiredService<IValidator<Person>>());
+        }
+
+        [TestMethod]
+        public void AddRuleflow_WithLoggerFactory_UsesProvidedFactory()
+        {
+            var services = new ServiceCollection();
+            var loggerFactory = LoggerFactory.Create(builder => { });
+
+            services.AddRuleflow<Person>(o => o.LoggerFactory = loggerFactory);
+
+            var provider = services.BuildServiceProvider();
+
+            _ = provider.GetRequiredService<IRuleRegistry<Person>>();
+
+            Assert.AreNotSame(NullLogger<EventHub.EventHubLog>.Instance, EventHub.Logger);
         }
     }
 }

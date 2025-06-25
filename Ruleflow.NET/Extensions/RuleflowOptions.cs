@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
 
 namespace Ruleflow.NET.Extensions
@@ -41,5 +42,12 @@ namespace Ruleflow.NET.Extensions
         /// for attribute based rules.
         /// </summary>
         public IEnumerable<string>? NamespaceFilters { get; set; }
+
+        /// <summary>
+        /// Optional logger factory used when initializing Ruleflow services.
+        /// If null, any <see cref="ILoggerFactory"/> registered in the service
+        /// provider will be used, falling back to <see cref="NullLoggerFactory"/>.
+        /// </summary>
+        public ILoggerFactory? LoggerFactory { get; set; }
     }
 }
