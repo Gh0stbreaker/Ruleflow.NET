@@ -69,7 +69,10 @@ var ageRule = RuleflowExtensions.CreateRule<Person>()
     .WithMessage("Age validation failed")
     .Build();
 
-var validator = new Validator<Person>(new[] { ageRule });
+using Microsoft.Extensions.Logging;
+
+var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+var validator = new Validator<Person>(new[] { ageRule }, loggerFactory.CreateLogger<Validator<Person>>());
 var result = validator.CollectValidationResults(new Person { Name = "John", Age = 17 });
 
 foreach (var error in result.Errors)
@@ -116,8 +119,12 @@ var emailRule = RuleflowExtensions.CreateDependentRule<SignUpModel>("EmailValida
     })
     .Build();
 
+using Microsoft.Extensions.Logging;
+
+var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
 var validator = new DependencyAwareValidator<SignUpModel>(
-    new[] { usernameRule, passwordRule, emailRule });
+    new[] { usernameRule, passwordRule, emailRule },
+    loggerFactory.CreateLogger<DependencyAwareValidator<SignUpModel>>());
 
 var signUp = new SignUpModel
 {
