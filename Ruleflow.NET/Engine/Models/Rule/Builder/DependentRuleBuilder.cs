@@ -8,7 +8,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
     /// <summary>
     /// Wrapper for dependent rules delegating to <see cref="UnifiedRuleBuilder{TInput}"/>.
     /// </summary>
-    public class DependentRuleBuilder<TInput> : IRuleBuilder<TInput, DependentRuleBuilder<TInput>>
+    internal class DependentRuleBuilder<TInput> : IRuleBuilder<TInput, DependentRuleBuilder<TInput>>
     {
         private readonly UnifiedRuleBuilder<TInput> _inner;
 

@@ -6,7 +6,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
     /// <summary>
     /// Wrapper for time based rules delegating to <see cref="UnifiedRuleBuilder{TInput}"/>.
     /// </summary>
-    public class TimeBasedRuleBuilder<TInput> : IRuleBuilder<TInput, TimeBasedRuleBuilder<TInput>>
+    internal class TimeBasedRuleBuilder<TInput> : IRuleBuilder<TInput, TimeBasedRuleBuilder<TInput>>
     {
         private readonly UnifiedRuleBuilder<TInput> _inner;
 

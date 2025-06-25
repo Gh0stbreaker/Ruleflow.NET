@@ -6,7 +6,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
     /// <summary>
     /// Wrapper builder for single responsibility rules delegating to <see cref="UnifiedRuleBuilder{TInput}"/>.
     /// </summary>
-    public class SingleResponsibilityRuleBuilder<TInput> : IRuleBuilder<TInput, SingleResponsibilityRuleBuilder<TInput>>
+    internal class SingleResponsibilityRuleBuilder<TInput> : IRuleBuilder<TInput, SingleResponsibilityRuleBuilder<TInput>>
     {
         private readonly UnifiedRuleBuilder<TInput> _inner;
 

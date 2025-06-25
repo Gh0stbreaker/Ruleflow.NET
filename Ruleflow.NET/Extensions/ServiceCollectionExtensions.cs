@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Ruleflow.NET.Engine.Extensions;
+using Ruleflow.NET.Engine.Models.Rule.Builder;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
 using Ruleflow.NET.Engine.Registry;
 using Ruleflow.NET.Engine.Registry.Interface;
@@ -43,8 +45,27 @@ namespace Ruleflow.NET.Extensions
             // Load attribute based validation rules if requested
             if (options.AutoRegisterAttributeRules)
             {
-                foreach (var rule in LoadAttributeRules(options))
-                    registry.RegisterRule(rule);
+                foreach (var vr in LoadAttributeRules(options))
+                {
+                    var wrapper = RuleBuilderFactory.CreateUnifiedRuleBuilder<TInput>()
+                        .WithRuleId(vr.Id)
+                        .WithPriority(vr.Priority)
+                        .WithValidation((input, ctx) =>
+                        {
+                            try
+                            {
+                                vr.Validate(input);
+                                return true;
+                            }
+                            catch
+                            {
+                                return false;
+                            }
+                        })
+                        .Build();
+
+                    registry.RegisterRule(wrapper);
+                }
             }
 
             services.AddSingleton<IRuleRegistry<TInput>>(registry);

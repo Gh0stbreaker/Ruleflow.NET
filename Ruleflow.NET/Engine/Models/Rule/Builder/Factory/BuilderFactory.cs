@@ -51,7 +51,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
         /// <param name="ruleType">Typ pravidla (volitelné).</param>
         /// <returns>Builder pro jednoduché pravidlo.</returns>
-        public static SingleResponsibilityRuleBuilder<TInput> CreateSingleResponsibilityRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
+        internal static SingleResponsibilityRuleBuilder<TInput> CreateSingleResponsibilityRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
         {
             ruleType ??= CreateRuleType<TInput>("SINGLE", "Single Responsibility Rule", "Pravidlo s jednou odpovědností");
             return new SingleResponsibilityRuleBuilder<TInput>(GetNextRuleId(), ruleType);
@@ -63,7 +63,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
         /// <param name="ruleType">Typ pravidla (volitelné).</param>
         /// <returns>Builder pro podmínkové pravidlo.</returns>
-        public static ConditionalRuleBuilder<TInput> CreateConditionalRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
+        internal static ConditionalRuleBuilder<TInput> CreateConditionalRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
         {
             ruleType ??= CreateRuleType<TInput>("CONDITIONAL", "Conditional Rule", "Podmínkové pravidlo");
             return new ConditionalRuleBuilder<TInput>(GetNextRuleId(), ruleType);
@@ -75,7 +75,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
         /// <param name="ruleType">Typ pravidla (volitelné).</param>
         /// <returns>Builder pro závislé pravidlo.</returns>
-        public static DependentRuleBuilder<TInput> CreateDependentRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
+        internal static DependentRuleBuilder<TInput> CreateDependentRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
         {
             ruleType ??= CreateRuleType<TInput>("DEPENDENT", "Dependent Rule", "Pravidlo závislé na jiných pravidlech");
             return new DependentRuleBuilder<TInput>(GetNextRuleId(), ruleType);
@@ -87,7 +87,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
         /// <param name="ruleType">Typ pravidla (volitelné).</param>
         /// <returns>Builder pro přepínací pravidlo.</returns>
-        public static SwitchRuleBuilder<TInput> CreateSwitchRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
+        internal static SwitchRuleBuilder<TInput> CreateSwitchRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
         {
             ruleType ??= CreateRuleType<TInput>("SWITCH", "Switch Rule", "Přepínací pravidlo");
             return new SwitchRuleBuilder<TInput>(GetNextRuleId(), ruleType);
@@ -100,7 +100,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// <typeparam name="TKey">Typ klíče pro přepínání.</typeparam>
         /// <param name="ruleType">Typ pravidla (volitelné).</param>
         /// <returns>Builder pro přepínací pravidlo se silně typovaným klíčem.</returns>
-        public static SwitchRuleBuilder<TInput, TKey> CreateSwitchRuleBuilder<TInput, TKey>(RuleType<TInput>? ruleType = null)
+        internal static SwitchRuleBuilder<TInput, TKey> CreateSwitchRuleBuilder<TInput, TKey>(RuleType<TInput>? ruleType = null)
             where TKey : notnull
         {
             ruleType ??= CreateRuleType<TInput>("TYPED_SWITCH", "Typed Switch Rule", "Typované přepínací pravidlo");
@@ -114,7 +114,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// <typeparam name="THistoryData">Typ historických dat používaných pro predikci.</typeparam>
         /// <param name="ruleType">Typ pravidla (volitelné).</param>
         /// <returns>Builder pro prediktivní pravidlo.</returns>
-        public static PredictiveRuleBuilder<TInput, THistoryData> CreatePredictiveRuleBuilder<TInput, THistoryData>(RuleType<TInput>? ruleType = null)
+        internal static PredictiveRuleBuilder<TInput, THistoryData> CreatePredictiveRuleBuilder<TInput, THistoryData>(RuleType<TInput>? ruleType = null)
         {
             ruleType ??= CreateRuleType<TInput>("PREDICTIVE", "Predictive Rule", "Prediktivní pravidlo");
             return new PredictiveRuleBuilder<TInput, THistoryData>(GetNextRuleId(), ruleType);
@@ -126,7 +126,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
         /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
         /// <param name="ruleType">Typ pravidla (volitelné).</param>
         /// <returns>Builder pro časové pravidlo.</returns>
-        public static TimeBasedRuleBuilder<TInput> CreateTimeBasedRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
+        internal static TimeBasedRuleBuilder<TInput> CreateTimeBasedRuleBuilder<TInput>(RuleType<TInput>? ruleType = null)
         {
             ruleType ??= CreateRuleType<TInput>("TIME_BASED", "Time Based Rule", "Časově závislé pravidlo");
             return new TimeBasedRuleBuilder<TInput>(GetNextRuleId(), ruleType);

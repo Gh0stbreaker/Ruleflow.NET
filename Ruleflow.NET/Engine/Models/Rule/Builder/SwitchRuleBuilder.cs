@@ -8,7 +8,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
     /// <summary>
     /// Wrapper for switch rules delegating to <see cref="UnifiedRuleBuilder{TInput}"/>.
     /// </summary>
-    public class SwitchRuleBuilder<TInput> : IRuleBuilder<TInput, SwitchRuleBuilder<TInput>>
+    internal class SwitchRuleBuilder<TInput> : IRuleBuilder<TInput, SwitchRuleBuilder<TInput>>
     {
         private readonly UnifiedRuleBuilder<TInput> _inner;
 
@@ -37,7 +37,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
     /// <summary>
     /// Typed switch rule builder delegating to the unified builder.
     /// </summary>
-    public class SwitchRuleBuilder<TInput, TKey> : IRuleBuilder<TInput, SwitchRuleBuilder<TInput, TKey>> where TKey : notnull
+    internal class SwitchRuleBuilder<TInput, TKey> : IRuleBuilder<TInput, SwitchRuleBuilder<TInput, TKey>> where TKey : notnull
     {
         private readonly UnifiedRuleBuilder<TInput> _inner;
 
