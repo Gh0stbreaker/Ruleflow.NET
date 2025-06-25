@@ -1,10 +1,13 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.DependencyInjection;
 using Ruleflow.NET.Engine.Data.Enums;
 using Ruleflow.NET.Engine.Data.Mapping;
 using Ruleflow.NET.Engine.Extensions;
 using Ruleflow.NET.Engine.Validation;
 using Ruleflow.NET.Engine.Validation.Core.Validators;
 using Ruleflow.NET.Engine.Validation.Enums;
+using Ruleflow.NET.Extensions;
+using Ruleflow.NET.Engine.Registry.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +68,51 @@ namespace Ruleflow.NET.Tests
 
             var valid = new Person { Name = "Jane", Age = 20 };
             Assert.IsTrue(validator.IsValid(valid));
+        }
+
+        [TestMethod]
+        public void AddRuleflow_AutoRegistersRulesAndMapper()
+        {
+            var services = new ServiceCollection();
+            services.AddRuleflow<Person>(o =>
+            {
+                o.AutoRegisterAttributeRules = true;
+                o.AutoRegisterMappings = true;
+                o.AssemblyFilters = new[] { typeof(PersonRules).Assembly.GetName().Name };
+                o.NamespaceFilters = new[] { typeof(AttributeIntegrationTests).Namespace! };
+            });
+
+            var provider = services.BuildServiceProvider();
+
+            var registry = provider.GetRequiredService<IRuleRegistry<Person>>();
+            Assert.AreEqual(1, registry.Count);
+
+            var mapper = provider.GetRequiredService<IDataAutoMapper<Person>>();
+            var context = new DataContext();
+            var data = new Dictionary<string, string> { { "name", "Bob" }, { "age", "30" } };
+            var person = mapper.MapToObject(data, context);
+            Assert.AreEqual("Bob", person.Name);
+            Assert.AreEqual(30, person.Age);
+        }
+
+        [TestMethod]
+        public void AddRuleflow_NamespaceFilter_ExcludesRules()
+        {
+            var services = new ServiceCollection();
+            services.AddRuleflow<Person>(o =>
+            {
+                o.AutoRegisterAttributeRules = true;
+                o.AutoRegisterMappings = true;
+                o.NamespaceFilters = new[] { "Other.Namespace" };
+            });
+
+            var provider = services.BuildServiceProvider();
+
+            var registry = provider.GetRequiredService<IRuleRegistry<Person>>();
+            Assert.AreEqual(0, registry.Count);
+
+            // mapper still registered
+            Assert.IsNotNull(provider.GetRequiredService<IDataAutoMapper<Person>>());
         }
     }
 }
