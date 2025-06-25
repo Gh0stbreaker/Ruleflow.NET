@@ -76,6 +76,62 @@ foreach (var error in result.Errors)
     Console.WriteLine($"{error.Severity}: {error.Message}");
 ```
 
+### Real-world example
+
+```csharp
+public class SignUpModel
+{
+    public string Username { get; set; }
+    public string Email { get; set; }
+    public string Password { get; set; }
+}
+
+var usernameRule = RuleflowExtensions.CreateRule<SignUpModel>()
+    .WithId("UsernameValidation")
+    .WithAction(m =>
+    {
+        if (string.IsNullOrWhiteSpace(m.Username))
+            throw new ArgumentException("Username is required");
+        if (m.Username.Length < 3)
+            throw new ArgumentException("Username must be at least 3 characters");
+    })
+    .Build();
+
+var passwordRule = RuleflowExtensions.CreateRule<SignUpModel>()
+    .WithId("PasswordValidation")
+    .WithAction(m =>
+    {
+        if (string.IsNullOrWhiteSpace(m.Password) || m.Password.Length < 8)
+            throw new ArgumentException("Password must be at least 8 characters");
+    })
+    .Build();
+
+var emailRule = RuleflowExtensions.CreateDependentRule<SignUpModel>("EmailValidation")
+    .DependsOn("UsernameValidation")
+    .WithDependencyType(DependencyType.RequiresAllSuccess)
+    .WithAction(m =>
+    {
+        if (string.IsNullOrWhiteSpace(m.Email) || !m.Email.Contains("@"))
+            throw new ArgumentException("Valid email is required");
+    })
+    .Build();
+
+var validator = new DependencyAwareValidator<SignUpModel>(
+    new[] { usernameRule, passwordRule, emailRule });
+
+var signUp = new SignUpModel
+{
+    Username = "jo",
+    Email = "invalid",
+    Password = "pw"
+};
+
+var result2 = validator.CollectValidationResults(signUp);
+
+foreach (var error in result2.Errors)
+    Console.WriteLine(error.Message);
+```
+
 ### Dependency injection
 
 ```csharp
