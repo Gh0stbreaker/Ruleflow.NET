@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
 using Ruleflow.NET.Engine.Registry;
@@ -7,6 +9,9 @@ using Ruleflow.NET.Engine.Registry.Interface;
 using Ruleflow.NET.Engine.Validation.Core.Context;
 using Ruleflow.NET.Engine.Validation.Interfaces;
 using Ruleflow.NET.Engine.Validation.Core.Validators;
+using Ruleflow.NET.Engine.Validation;
+using Ruleflow.NET.Engine.Data.Mapping;
+using Ruleflow.NET.Engine.Validation.Core.Base;
 
 namespace Ruleflow.NET.Extensions
 {
@@ -31,7 +36,22 @@ namespace Ruleflow.NET.Extensions
 
             services.AddSingleton(options);
 
-            services.AddSingleton<IRuleRegistry<TInput>>(sp => new RuleRegistry<TInput>(options.InitialRules ?? Array.Empty<IRule<TInput>>()));
+            var registry = new RuleRegistry<TInput>(options.InitialRules ?? Array.Empty<IRule<TInput>>());
+
+            // Load attribute based validation rules if requested
+            if (options.AutoRegisterAttributeRules)
+            {
+                foreach (var rule in LoadAttributeRules(options))
+                    registry.RegisterRule(rule);
+            }
+
+            services.AddSingleton<IRuleRegistry<TInput>>(registry);
+
+            // Register automapper built from attributes if requested
+            if (options.AutoRegisterMappings)
+            {
+                services.AddSingleton<IDataAutoMapper<TInput>>(_ => DataAutoMapper<TInput>.FromAttributes());
+            }
 
             // Register ValidationContext singleton so it can be injected where needed
             services.AddSingleton(ValidationContext.Instance);
@@ -53,6 +73,48 @@ namespace Ruleflow.NET.Extensions
             }
 
             return services;
+        }
+
+        private static IEnumerable<IValidationRule<TInput>> LoadAttributeRules<TInput>(RuleflowOptions<TInput> options)
+        {
+            var assemblies = ResolveAssemblies(options);
+            foreach (var assembly in assemblies)
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (options.NamespaceFilters != null && !options.NamespaceFilters.Any(ns => type.Namespace != null && type.Namespace.StartsWith(ns)))
+                        continue;
+
+                    foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                    {
+                        var attr = method.GetCustomAttribute<ValidationRuleAttribute>();
+                        if (attr == null) continue;
+
+                        var parameters = method.GetParameters();
+                        if (parameters.Length != 1 || parameters[0].ParameterType != typeof(TInput))
+                            continue;
+                        if (method.ReturnType != typeof(void))
+                            continue;
+
+                        var action = (Action<TInput>)Delegate.CreateDelegate(typeof(Action<TInput>), method);
+                        var rule = new ActionValidationRule<TInput>(attr.Id, action);
+                        rule.SetPriority(attr.Priority);
+                        rule.SetSeverity(attr.Severity);
+                        yield return rule;
+                    }
+                }
+            }
+        }
+
+        private static IEnumerable<Assembly> ResolveAssemblies<TInput>(RuleflowOptions<TInput> options)
+        {
+            if (options.AssemblyFilters != null && options.AssemblyFilters.Any())
+            {
+                return AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(a => options.AssemblyFilters.Contains(a.GetName().Name, StringComparer.OrdinalIgnoreCase));
+            }
+
+            return new[] { typeof(TInput).Assembly };
         }
     }
 }

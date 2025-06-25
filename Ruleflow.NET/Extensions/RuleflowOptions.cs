@@ -17,5 +17,29 @@ namespace Ruleflow.NET.Extensions
         /// If true, a default <see cref="IValidator{TInput}"/> built from registered rules will be registered.
         /// </summary>
         public bool RegisterDefaultValidator { get; set; }
+
+        /// <summary>
+        /// When true, validation rules annotated with <see cref="Engine.Validation.ValidationRuleAttribute"/>
+        /// will be automatically loaded during <c>AddRuleflow</c>.
+        /// </summary>
+        public bool AutoRegisterAttributeRules { get; set; }
+
+        /// <summary>
+        /// When true, a <see cref="Engine.Data.Mapping.IDataAutoMapper{TInput}"/> built from
+        /// <see cref="Engine.Data.Mapping.MapKeyAttribute"/> annotations will be registered.
+        /// </summary>
+        public bool AutoRegisterMappings { get; set; }
+
+        /// <summary>
+        /// Optional list of assembly names to restrict attribute scanning.
+        /// If empty, the assembly containing <typeparamref name="TInput"/> is scanned.
+        /// </summary>
+        public IEnumerable<string>? AssemblyFilters { get; set; }
+
+        /// <summary>
+        /// Optional list of namespace prefixes to restrict which types are scanned
+        /// for attribute based rules.
+        /// </summary>
+        public IEnumerable<string>? NamespaceFilters { get; set; }
     }
 }
