@@ -1,118 +1,39 @@
-﻿using Ruleflow.NET.Engine.Models.Rule;
+using System.Collections.Generic;
 using Ruleflow.NET.Engine.Models.Rule.Builder.Interface;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
 using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
-using System.Collections.Generic;
 
 namespace Ruleflow.NET.Engine.Models.Rule.Builder
 {
     /// <summary>
-    /// Builder pro vytváření pravidel závislých na jiných pravidlech.
+    /// Wrapper for dependent rules delegating to <see cref="UnifiedRuleBuilder{TInput}"/>.
     /// </summary>
-    /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
-    public class DependentRuleBuilder<TInput> : RuleBuilder<TInput, DependentRuleBuilder<TInput>>
+    public class DependentRuleBuilder<TInput> : IRuleBuilder<TInput, DependentRuleBuilder<TInput>>
     {
-        private DependentRule<TInput>.EvaluateDependenciesDelegate? _evaluateFunc;
-        private readonly List<IRule<TInput>> _dependencies = new List<IRule<TInput>>();
+        private readonly UnifiedRuleBuilder<TInput> _inner;
 
-        /// <summary>
-        /// Vytvoří nový builder pro závislé pravidlo.
-        /// </summary>
-        /// <param name="id">ID pravidla.</param>
-        /// <param name="type">Typ pravidla.</param>
-        public DependentRuleBuilder(int id, IRuleType<TInput> type) : base(id, type)
+        public DependentRuleBuilder(int id, IRuleType<TInput> type)
         {
+            _inner = new UnifiedRuleBuilder<TInput>(id, type);
         }
 
-        /// <summary>
-        /// Nastaví funkci pro vyhodnocení závislostí.
-        /// </summary>
-        /// <param name="evaluateFunc">Funkce pro vyhodnocení závislostí.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public DependentRuleBuilder<TInput> WithEvaluationFunction(DependentRule<TInput>.EvaluateDependenciesDelegate evaluateFunc)
-        {
-            _evaluateFunc = evaluateFunc;
-            return this;
-        }
+        // common configuration
+        public DependentRuleBuilder<TInput> WithRuleId(string ruleId) { _inner.WithRuleId(ruleId); return this; }
+        public DependentRuleBuilder<TInput> WithName(string name) { _inner.WithName(name); return this; }
+        public DependentRuleBuilder<TInput> WithDescription(string description) { _inner.WithDescription(description); return this; }
+        public DependentRuleBuilder<TInput> WithPriority(int priority) { _inner.WithPriority(priority); return this; }
+        public DependentRuleBuilder<TInput> SetActive(bool isActive) { _inner.SetActive(isActive); return this; }
+        public DependentRuleBuilder<TInput> WithTimestamp(DateTimeOffset timestamp) { _inner.WithTimestamp(timestamp); return this; }
+        public DependentRuleBuilder<TInput> WithType(IRuleType<TInput> type) { _inner.WithType(type); return this; }
 
-        /// <summary>
-        /// Přidá závislost na jiném pravidle.
-        /// </summary>
-        /// <param name="rule">Pravidlo, na kterém závisí toto pravidlo.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public DependentRuleBuilder<TInput> AddDependency(IRule<TInput> rule)
-        {
-            _dependencies.Add(rule);
-            return this;
-        }
+        // specific configuration
+        public DependentRuleBuilder<TInput> WithEvaluationFunction(DependentRule<TInput>.EvaluateDependenciesDelegate func) { _inner.WithEvaluationFunction(func); return this; }
+        public DependentRuleBuilder<TInput> AddDependency(IRule<TInput> rule) { _inner.AddDependency(rule); return this; }
+        public DependentRuleBuilder<TInput> AddDependencies(IEnumerable<IRule<TInput>> rules) { _inner.AddDependencies(rules); return this; }
+        public DependentRuleBuilder<TInput> RequireAllDependencies() { _inner.RequireAllDependencies(); return this; }
+        public DependentRuleBuilder<TInput> RequireAnyDependency() { _inner.RequireAnyDependency(); return this; }
+        public DependentRuleBuilder<TInput> RequireMinimumDependencies(int minimum) { _inner.RequireMinimumDependencies(minimum); return this; }
 
-        /// <summary>
-        /// Přidá kolekci závislostí na jiných pravidlech.
-        /// </summary>
-        /// <param name="rules">Kolekce pravidel, na kterých závisí toto pravidlo.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public DependentRuleBuilder<TInput> AddDependencies(IEnumerable<IRule<TInput>> rules)
-        {
-            foreach (var rule in rules)
-            {
-                _dependencies.Add(rule);
-            }
-            return this;
-        }
-
-        /// <summary>
-        /// Přepne builder do režimu ALL (všechny závislosti musí projít).
-        /// </summary>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public DependentRuleBuilder<TInput> RequireAllDependencies()
-        {
-            _evaluateFunc = (input, context, results) => results.All(r => r.IsSuccess);
-            return this;
-        }
-
-        /// <summary>
-        /// Přepne builder do režimu ANY (alespoň jedna závislost musí projít).
-        /// </summary>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public DependentRuleBuilder<TInput> RequireAnyDependency()
-        {
-            _evaluateFunc = (input, context, results) => results.Any(r => r.IsSuccess);
-            return this;
-        }
-
-        /// <summary>
-        /// Přepne builder do režimu minimálního počtu úspěšných závislostí.
-        /// </summary>
-        /// <param name="minimumCount">Minimální počet úspěšných závislostí.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public DependentRuleBuilder<TInput> RequireMinimumDependencies(int minimumCount)
-        {
-            _evaluateFunc = (input, context, results) => results.Count(r => r.IsSuccess) >= minimumCount;
-            return this;
-        }
-
-        /// <summary>
-        /// Sestaví pravidlo podle nastavené konfigurace.
-        /// </summary>
-        /// <returns>Vytvořené pravidlo.</returns>
-        public override Rule<TInput> Build()
-        {
-            if (_evaluateFunc == null)
-                throw new InvalidOperationException("Evaluační funkce musí být nastavena. Použijte metody RequireAllDependencies, RequireAnyDependency, RequireMinimumDependencies nebo WithEvaluationFunction.");
-
-            var rule = new DependentRule<TInput>(
-                Id,
-                Type,
-                _evaluateFunc,
-                _dependencies,
-                RuleId,
-                Name ?? "Unnamed Dependent Rule",
-                Description,
-                Priority,
-                IsActive,
-                Timestamp);
-
-            return rule;
-        }
+        public Rule<TInput> Build() => _inner.Build();
     }
 }

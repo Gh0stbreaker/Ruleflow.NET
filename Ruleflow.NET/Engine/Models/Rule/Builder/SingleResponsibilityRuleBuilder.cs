@@ -1,70 +1,33 @@
-﻿using Ruleflow.NET.Engine.Models.Rule;
 using Ruleflow.NET.Engine.Models.Rule.Builder.Interface;
 using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 
 namespace Ruleflow.NET.Engine.Models.Rule.Builder
 {
     /// <summary>
-    /// Builder pro vytváření pravidel s jednou odpovědností.
+    /// Wrapper builder for single responsibility rules delegating to <see cref="UnifiedRuleBuilder{TInput}"/>.
     /// </summary>
-    /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
-    public class SingleResponsibilityRuleBuilder<TInput> : RuleBuilder<TInput, SingleResponsibilityRuleBuilder<TInput>>
+    public class SingleResponsibilityRuleBuilder<TInput> : IRuleBuilder<TInput, SingleResponsibilityRuleBuilder<TInput>>
     {
-        private SingleResponsibilityRule<TInput>.ValidateDelegate? _validateFunc;
-        private string? _errorMessage;
+        private readonly UnifiedRuleBuilder<TInput> _inner;
 
-        /// <summary>
-        /// Vytvoří nový builder pro jednoduché pravidlo.
-        /// </summary>
-        /// <param name="id">ID pravidla.</param>
-        /// <param name="type">Typ pravidla.</param>
-        public SingleResponsibilityRuleBuilder(int id, IRuleType<TInput> type) : base(id, type)
+        public SingleResponsibilityRuleBuilder(int id, IRuleType<TInput> type)
         {
+            _inner = new UnifiedRuleBuilder<TInput>(id, type);
         }
 
-        /// <summary>
-        /// Nastaví validační funkci pravidla.
-        /// </summary>
-        /// <param name="validateFunc">Funkce pro validaci.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public SingleResponsibilityRuleBuilder<TInput> WithValidation(SingleResponsibilityRule<TInput>.ValidateDelegate validateFunc)
-        {
-            _validateFunc = validateFunc;
-            return this;
-        }
+        // Common configuration delegates to inner builder
+        public SingleResponsibilityRuleBuilder<TInput> WithRuleId(string ruleId) { _inner.WithRuleId(ruleId); return this; }
+        public SingleResponsibilityRuleBuilder<TInput> WithName(string name) { _inner.WithName(name); return this; }
+        public SingleResponsibilityRuleBuilder<TInput> WithDescription(string description) { _inner.WithDescription(description); return this; }
+        public SingleResponsibilityRuleBuilder<TInput> WithPriority(int priority) { _inner.WithPriority(priority); return this; }
+        public SingleResponsibilityRuleBuilder<TInput> SetActive(bool isActive) { _inner.SetActive(isActive); return this; }
+        public SingleResponsibilityRuleBuilder<TInput> WithTimestamp(DateTimeOffset timestamp) { _inner.WithTimestamp(timestamp); return this; }
+        public SingleResponsibilityRuleBuilder<TInput> WithType(IRuleType<TInput> type) { _inner.WithType(type); return this; }
 
-        /// <summary>
-        /// Nastaví chybovou zprávu pro případ neúspěchu validace.
-        /// </summary>
-        /// <param name="errorMessage">Chybová zpráva.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public SingleResponsibilityRuleBuilder<TInput> WithErrorMessage(string errorMessage)
-        {
-            _errorMessage = errorMessage;
-            return this;
-        }
+        // Specific configuration
+        public SingleResponsibilityRuleBuilder<TInput> WithValidation(SingleResponsibilityRule<TInput>.ValidateDelegate func) { _inner.WithValidation(func); return this; }
+        public SingleResponsibilityRuleBuilder<TInput> WithErrorMessage(string message) { _inner.WithErrorMessage(message); return this; }
 
-        /// <summary>
-        /// Sestaví pravidlo podle nastavené konfigurace.
-        /// </summary>
-        /// <returns>Vytvořené pravidlo.</returns>
-        public override Rule<TInput> Build()
-        {
-            if (_validateFunc == null)
-                throw new InvalidOperationException("Validační funkce musí být nastavena.");
-
-            var rule = new SingleResponsibilityRule<TInput>(
-                Id,
-                Type,
-                _validateFunc,
-                RuleId,
-                Name ?? "Unnamed Single Responsibility Rule",
-                Description,
-                Priority,
-                IsActive,
-                Timestamp);
-
-            return rule;
-        }
+        public Rule<TInput> Build() => _inner.Build();
     }
 }

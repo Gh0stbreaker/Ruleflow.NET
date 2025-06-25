@@ -1,4 +1,3 @@
-﻿using Ruleflow.NET.Engine.Models.Rule;
 using Ruleflow.NET.Engine.Models.Rule.Builder.Interface;
 using Ruleflow.NET.Engine.Models.Rule.Interface;
 using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
@@ -6,80 +5,31 @@ using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
 namespace Ruleflow.NET.Engine.Models.Rule.Builder
 {
     /// <summary>
-    /// Builder pro vytváření podmínkových pravidel.
+    /// Wrapper for conditional rules delegating to <see cref="UnifiedRuleBuilder{TInput}"/>.
     /// </summary>
-    /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
-    public class ConditionalRuleBuilder<TInput> : RuleBuilder<TInput, ConditionalRuleBuilder<TInput>>
+    public class ConditionalRuleBuilder<TInput> : IRuleBuilder<TInput, ConditionalRuleBuilder<TInput>>
     {
-        private ConditionalRule<TInput>.ConditionDelegate? _conditionFunc;
-        private IRule<TInput>? _thenRule;
-        private IRule<TInput>? _elseRule;
+        private readonly UnifiedRuleBuilder<TInput> _inner;
 
-        /// <summary>
-        /// Vytvoří nový builder pro podmínkové pravidlo.
-        /// </summary>
-        /// <param name="id">ID pravidla.</param>
-        /// <param name="type">Typ pravidla.</param>
-        public ConditionalRuleBuilder(int id, IRuleType<TInput> type) : base(id, type)
+        public ConditionalRuleBuilder(int id, IRuleType<TInput> type)
         {
+            _inner = new UnifiedRuleBuilder<TInput>(id, type);
         }
 
-        /// <summary>
-        /// Nastaví podmínkovou funkci pravidla.
-        /// </summary>
-        /// <param name="conditionFunc">Funkce pro vyhodnocení podmínky.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public ConditionalRuleBuilder<TInput> WithCondition(ConditionalRule<TInput>.ConditionDelegate conditionFunc)
-        {
-            _conditionFunc = conditionFunc;
-            return this;
-        }
+        // common configuration
+        public ConditionalRuleBuilder<TInput> WithRuleId(string ruleId) { _inner.WithRuleId(ruleId); return this; }
+        public ConditionalRuleBuilder<TInput> WithName(string name) { _inner.WithName(name); return this; }
+        public ConditionalRuleBuilder<TInput> WithDescription(string description) { _inner.WithDescription(description); return this; }
+        public ConditionalRuleBuilder<TInput> WithPriority(int priority) { _inner.WithPriority(priority); return this; }
+        public ConditionalRuleBuilder<TInput> SetActive(bool isActive) { _inner.SetActive(isActive); return this; }
+        public ConditionalRuleBuilder<TInput> WithTimestamp(DateTimeOffset timestamp) { _inner.WithTimestamp(timestamp); return this; }
+        public ConditionalRuleBuilder<TInput> WithType(IRuleType<TInput> type) { _inner.WithType(type); return this; }
 
-        /// <summary>
-        /// Nastaví pravidlo pro větev THEN (když je podmínka splněna).
-        /// </summary>
-        /// <param name="thenRule">Pravidlo pro větev THEN.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public ConditionalRuleBuilder<TInput> WithThenRule(IRule<TInput> thenRule)
-        {
-            _thenRule = thenRule;
-            return this;
-        }
+        // specific configuration
+        public ConditionalRuleBuilder<TInput> WithCondition(ConditionalRule<TInput>.ConditionDelegate func) { _inner.WithCondition(func); return this; }
+        public ConditionalRuleBuilder<TInput> WithThenRule(IRule<TInput> rule) { _inner.WithThenRule(rule); return this; }
+        public ConditionalRuleBuilder<TInput> WithElseRule(IRule<TInput> rule) { _inner.WithElseRule(rule); return this; }
 
-        /// <summary>
-        /// Nastaví pravidlo pro větev ELSE (když podmínka není splněna).
-        /// </summary>
-        /// <param name="elseRule">Pravidlo pro větev ELSE.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public ConditionalRuleBuilder<TInput> WithElseRule(IRule<TInput> elseRule)
-        {
-            _elseRule = elseRule;
-            return this;
-        }
-
-        /// <summary>
-        /// Sestaví pravidlo podle nastavené konfigurace.
-        /// </summary>
-        /// <returns>Vytvořené pravidlo.</returns>
-        public override Rule<TInput> Build()
-        {
-            if (_conditionFunc == null)
-                throw new InvalidOperationException("Podmínková funkce musí být nastavena.");
-
-            var rule = new ConditionalRule<TInput>(
-                Id,
-                Type,
-                _conditionFunc,
-                _thenRule,
-                _elseRule,
-                RuleId,
-                Name ?? "Unnamed Conditional Rule",
-                Description,
-                Priority,
-                IsActive,
-                Timestamp);
-
-            return rule;
-        }
+        public Rule<TInput> Build() => _inner.Build();
     }
 }

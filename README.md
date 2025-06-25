@@ -233,6 +233,15 @@ var batchValidator = new BatchValidator<Item>(new[] { quantityRule });
 var result = batchValidator.CollectValidationResults(items);
 ```
 
+#### Unified Rule Builder
+
+```csharp
+var rule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Person>()
+    .WithValidation((p, ctx) => p.Age >= 18)
+    .WithPriority(10)
+    .Build();
+```
+
 #### Combining Validators
 
 ```csharp

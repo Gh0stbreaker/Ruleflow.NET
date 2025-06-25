@@ -1,69 +1,33 @@
-﻿using Ruleflow.NET.Engine.Models.Rule.Builder.Interface;
+using Ruleflow.NET.Engine.Models.Rule.Builder.Interface;
 using Ruleflow.NET.Engine.Models.Rule.Type.Interface;
-using System;
 
 namespace Ruleflow.NET.Engine.Models.Rule.Builder
 {
     /// <summary>
-    /// Builder pro vytváření časových pravidel.
+    /// Wrapper for time based rules delegating to <see cref="UnifiedRuleBuilder{TInput}"/>.
     /// </summary>
-    /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
-    public class TimeBasedRuleBuilder<TInput> : RuleBuilder<TInput, TimeBasedRuleBuilder<TInput>>
+    public class TimeBasedRuleBuilder<TInput> : IRuleBuilder<TInput, TimeBasedRuleBuilder<TInput>>
     {
-        private TimeBasedRule<TInput>.TimeConditionDelegate? _timeConditionFunc;
-        private bool _useCurrentTime = true;
+        private readonly UnifiedRuleBuilder<TInput> _inner;
 
-        /// <summary>
-        /// Vytvoří nový builder pro časové pravidlo.
-        /// </summary>
-        /// <param name="id">Identifikátor pravidla.</param>
-        /// <param name="type">Typ pravidla.</param>
-        public TimeBasedRuleBuilder(int id, IRuleType<TInput> type) : base(id, type)
+        public TimeBasedRuleBuilder(int id, IRuleType<TInput> type)
         {
+            _inner = new UnifiedRuleBuilder<TInput>(id, type);
         }
 
-        /// <summary>
-        /// Nastaví funkci časové podmínky.
-        /// </summary>
-        /// <param name="timeConditionFunc">Funkce vyhodnocující časovou podmínku.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public TimeBasedRuleBuilder<TInput> WithTimeCondition(TimeBasedRule<TInput>.TimeConditionDelegate timeConditionFunc)
-        {
-            _timeConditionFunc = timeConditionFunc ?? throw new ArgumentNullException(nameof(timeConditionFunc));
-            return this;
-        }
+        // common configuration
+        public TimeBasedRuleBuilder<TInput> WithRuleId(string ruleId) { _inner.WithRuleId(ruleId); return this; }
+        public TimeBasedRuleBuilder<TInput> WithName(string name) { _inner.WithName(name); return this; }
+        public TimeBasedRuleBuilder<TInput> WithDescription(string description) { _inner.WithDescription(description); return this; }
+        public TimeBasedRuleBuilder<TInput> WithPriority(int priority) { _inner.WithPriority(priority); return this; }
+        public TimeBasedRuleBuilder<TInput> SetActive(bool isActive) { _inner.SetActive(isActive); return this; }
+        public TimeBasedRuleBuilder<TInput> WithTimestamp(DateTimeOffset timestamp) { _inner.WithTimestamp(timestamp); return this; }
+        public TimeBasedRuleBuilder<TInput> WithType(IRuleType<TInput> type) { _inner.WithType(type); return this; }
 
-        /// <summary>
-        /// Nastaví, zda se má pro vyhodnocení použít aktuální čas.
-        /// </summary>
-        /// <param name="useCurrentTime">True pro použití aktuálního času, false pro čas z kontextu.</param>
-        /// <returns>Instance builderu pro řetězení.</returns>
-        public TimeBasedRuleBuilder<TInput> UseCurrentTime(bool useCurrentTime)
-        {
-            _useCurrentTime = useCurrentTime;
-            return this;
-        }
+        // specific configuration
+        public TimeBasedRuleBuilder<TInput> WithTimeCondition(TimeBasedRule<TInput>.TimeConditionDelegate func) { _inner.WithTimeCondition(func); return this; }
+        public TimeBasedRuleBuilder<TInput> UseCurrentTime(bool useCurrent) { _inner.UseCurrentTime(useCurrent); return this; }
 
-        /// <summary>
-        /// Sestaví a vrátí časové pravidlo podle nastavené konfigurace.
-        /// </summary>
-        /// <returns>Vytvořené časové pravidlo.</returns>
-        public override Rule<TInput> Build()
-        {
-            if (_timeConditionFunc == null)
-                throw new InvalidOperationException("Časové pravidlo vyžaduje funkci pro vyhodnocení časové podmínky.");
-
-            return new TimeBasedRule<TInput>(
-                Id,
-                Type,
-                _timeConditionFunc,
-                _useCurrentTime,
-                RuleId,
-                Name,
-                Description,
-                Priority,
-                IsActive,
-                Timestamp);
-        }
+        public Rule<TInput> Build() => _inner.Build();
     }
 }

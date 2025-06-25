@@ -47,7 +47,7 @@ namespace Ruleflow.NET.Tests
         public void GenericContext_PopulatesRuleMetadata()
         {
             var type = RuleBuilderFactory.CreateRuleType<Dummy>("S", "Single");
-            var rule = RuleBuilderFactory.CreateSingleResponsibilityRuleBuilder<Dummy>(type)
+            var rule = RuleBuilderFactory.CreateUnifiedRuleBuilder<Dummy>(type)
                 .WithValidation((d, c) => true)
                 .WithErrorMessage("err")
                 .Build();
