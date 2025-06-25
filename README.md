@@ -173,6 +173,37 @@ var dictionary = new Dictionary<string, string>
 Person person = mapper.MapToObject(dictionary, context);
 ```
 
+#### Attribute-Based Mapping and Rules
+
+```csharp
+public class Person
+{
+    [MapKey("name", DataType.String, Required = true)]
+    public string Name { get; set; } = string.Empty;
+
+    [MapKey("age", DataType.Int32, Required = true)]
+    public int Age { get; set; }
+}
+
+var mapper = DataAutoMapper<Person>.FromAttributes();
+```
+
+Validation rules can also be declared on static methods:
+
+```csharp
+public static class PersonRules
+{
+    [ValidationRule("NameRequired")]
+    public static void NameRequired(Person p)
+    {
+        if (string.IsNullOrWhiteSpace(p.Name))
+            throw new ArgumentException("Name required");
+    }
+}
+
+var rules = AttributeRuleLoader.LoadValidationRules<Person>();
+```
+
 #### Working with Rule References
 
 ```csharp

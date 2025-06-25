@@ -4,6 +4,7 @@ using Ruleflow.NET.Engine.Data.Enums;
 using Ruleflow.NET.Engine.Data;
 using Ruleflow.NET.Engine.Data.Interfaces;
 using Ruleflow.NET.Engine.Data.Values;
+using Ruleflow.NET.Engine.Extensions;
 
 namespace Ruleflow.NET.Engine.Data.Mapping
 {
@@ -13,6 +14,16 @@ namespace Ruleflow.NET.Engine.Data.Mapping
     public class DataAutoMapper<T> : IDataAutoMapper<T>
     {
         private readonly List<DataMappingRule<T>> _rules;
+
+        /// <summary>
+        /// Creates a mapper using mapping rules discovered from
+        /// <see cref="MapKeyAttribute"/> attributes on <typeparamref name="T"/>.
+        /// </summary>
+        public static DataAutoMapper<T> FromAttributes()
+        {
+            var rules = Engine.Extensions.AttributeRuleLoader.LoadMappingRules<T>();
+            return new DataAutoMapper<T>(rules);
+        }
 
         /// <summary>
         /// Creates a new mapper with the provided rules.
