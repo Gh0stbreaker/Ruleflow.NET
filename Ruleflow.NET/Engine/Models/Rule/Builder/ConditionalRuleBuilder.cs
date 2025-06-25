@@ -7,7 +7,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
     /// <summary>
     /// Wrapper for conditional rules delegating to <see cref="UnifiedRuleBuilder{TInput}"/>.
     /// </summary>
-    public class ConditionalRuleBuilder<TInput> : IRuleBuilder<TInput, ConditionalRuleBuilder<TInput>>
+    internal class ConditionalRuleBuilder<TInput> : IRuleBuilder<TInput, ConditionalRuleBuilder<TInput>>
     {
         private readonly UnifiedRuleBuilder<TInput> _inner;
 

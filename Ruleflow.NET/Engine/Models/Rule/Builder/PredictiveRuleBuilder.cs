@@ -11,7 +11,7 @@ namespace Ruleflow.NET.Engine.Models.Rule.Builder
     /// </summary>
     /// <typeparam name="TInput">Typ validovaných dat.</typeparam>
     /// <typeparam name="THistoryData">Typ historických dat používaných pro predikci.</typeparam>
-    public class PredictiveRuleBuilder<TInput, THistoryData> : RuleBuilder<TInput, PredictiveRuleBuilder<TInput, THistoryData>>
+    internal class PredictiveRuleBuilder<TInput, THistoryData> : RuleBuilder<TInput, PredictiveRuleBuilder<TInput, THistoryData>>
     {
         private PredictiveRule<TInput, THistoryData>.PredictDelegate? _predictFunc;
         private readonly List<THistoryData> _historicalData = new List<THistoryData>();
